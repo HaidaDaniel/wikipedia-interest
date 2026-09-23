@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+import math
+from calendar import monthrange
+from datetime import date, datetime, timedelta
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+from .models import PageviewPoint
+
+TREND_DIRECTION_THRESHOLD_PCT = 10.0
+ANOMALY_ROBUST_Z_THRESHOLD = 3.5
+MIN_DIRECTIONAL_PERIODS = 12
+
+
+def choose_granularity(start: date, end: date, requested: str) -> str:
+    if requested in {"daily", "monthly"}:
+        return requested
+    if requested != "auto":
+        raise ValueError("granularity must be auto, daily or monthly")
+    return "monthly" if (end - start).days > 180 else "daily"
+
+
+def _month_start(value: date) -> date:
+    return date(value.year, value.month, 1)
+
+
+def _month_end(value: date) -> date:
+    return date(value.year, value.month, monthrange(value.year, value.month)[1])
+
+
+def expected_periods(start: date, end: date, granularity: str) -> pd.DatetimeIndex:
+    if granularity == "monthly":
+        return pd.date_range(_month_start(start), _month_start(end), freq="MS")
+    return pd.date_range(start, end, freq="D")
+
+
+def aggregate_points(points: list[PageviewPoint], start: date, end: date, granularity: str) -> tuple[pd.DataFrame, float]:
+    periods = expected_periods(start, end, granularity)
+    if not points:
+        frame = pd.DataFrame({"date": periods, "views": np.zeros(len(periods), dtype=float), "observed": False})
+        return frame, 0.0
+    raw = pd.DataFrame({"date": [p.timestamp for p in points], "views": [p.views for p in points]})
+    raw["date"] = pd.to_datetime(raw["date"]).dt.normalize()
+    raw["period"] = raw["date"].dt.to_period("M").dt.to_timestamp() if granularity == "monthly" else raw["date"]
+    grouped = raw.groupby("period", as_index=True)["views"].sum()
+    frame = pd.DataFrame({"date": periods})
+    frame["views"] = frame["date"].map(grouped).fillna(0).astype(float)
+    frame["observed"] = frame["date"].isin(grouped.index)
+    return frame, float(frame["observed"].mean()) if len(frame) else 0.0
+
+
+def _pct_change(old: float, new: float) -> float | None:
+    if old <= 0:
+        return None
+    return round((new - old) / old * 100, 2)
+
+
+def _robust_volatility(values: np.ndarray) -> float | None:
+    median = float(np.median(values)) if len(values) else 0
+    if median <= 0:
+        return None
+    return round(float(np.median(np.abs(values - median)) / median), 4)
+
+
+def _regression(values: np.ndarray, periods_per_year: int) -> tuple[float | None, float | None]:
+    if len(values) < 3 or np.all(values <= 0):
+        return None, None
+    x = np.arange(len(values), dtype=float)
+    y = np.log1p(np.maximum(values, 0))
+    slope, intercept = np.polyfit(x, y, 1)
+    prediction = slope * x + intercept
+    ss_tot = float(np.sum((y - np.mean(y)) ** 2))
+    r2 = 1.0 - float(np.sum((y - prediction) ** 2)) / ss_tot if ss_tot > 1e-12 else 1.0
+    annualized = (math.exp(float(slope) * periods_per_year) - 1) * 100
+    return round(annualized, 2), round(max(0.0, min(1.0, r2)), 3)
+
+
+def detect_anomalies(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    values = frame["views"].to_numpy(dtype=float)
+    if len(values) < 5:
+        return []
+    median = float(np.median(values))
+    mad = float(np.median(np.abs(values - median)))
+    scale = 1.4826 * mad
+    if scale < 1e-9:
+        q75, q25 = np.percentile(values, [75, 25])
+        scale = float((q75 - q25) / 1.349) if q75 > q25 else float(np.std(values))
+    if scale < 1e-9:
+        return []
+    robust_z = (values - median) / scale
+    anomalies: list[dict[str, Any]] = []
+    total = max(float(values.sum()), 1.0)
+    for index in np.where(np.abs(robust_z) >= ANOMALY_ROBUST_Z_THRESHOLD)[0]:
+        value = float(values[index])
+        anomalies.append({
+            "date": pd.Timestamp(frame.iloc[index]["date"]).date().isoformat(),
+            "views": int(round(value)),
+            "deviation": round(float(robust_z[index]), 2),
+            "share_of_total_pct": round(value / total * 100, 2),
+            "influence": "may materially distort the trend" if abs(robust_z[index]) >= 6 else "worth checking against an external event",
+        })
+    return anomalies
+
+
+def analyze_series(points: list[PageviewPoint], start: date, end: date, granularity: str, resolution_confidence: str) -> dict[str, Any]:
+    frame, completeness = aggregate_points(points, start, end, granularity)
+    values = frame["views"].to_numpy(dtype=float)
+    n = len(values)
+    periods_per_year = 12 if granularity == "monthly" else 365
+    window = max(1, min(3 if granularity == "monthly" else 7, n // 4 if n >= 4 else 1))
+    first_mean = float(np.mean(values[:window])) if n else 0
+    last_mean = float(np.mean(values[-window:])) if n else 0
+    trend_pct, r2 = _regression(values, periods_per_year)
+    smooth = pd.Series(values).rolling(window=min(3 if granularity == "monthly" else 7, max(1, n)), center=True, min_periods=1).mean().to_numpy()
+    smoothed_trend_pct, _ = _regression(smooth, periods_per_year)
+    anomalies = detect_anomalies(frame)
+    if trend_pct is None or n < (MIN_DIRECTIONAL_PERIODS if granularity == "monthly" else 30):
+        trend_label = "uncertain"
+    elif abs(trend_pct) < TREND_DIRECTION_THRESHOLD_PCT:
+        trend_label = "flat" if (r2 is None or r2 >= 0.25) else "uncertain"
+    elif r2 is not None and r2 < 0.15:
+        trend_label = "uncertain"
+    else:
+        trend_label = "growing" if trend_pct > 0 else "declining"
+    yoy = None
+    if n >= periods_per_year * 2:
+        yoy = _pct_change(float(np.mean(values[-periods_per_year:])), float(np.mean(values[-periods_per_year * 2:-periods_per_year])))
+        # Report conventional prior-year -> recent-year direction.
+        yoy = _pct_change(float(np.mean(values[-periods_per_year * 2:-periods_per_year])), float(np.mean(values[-periods_per_year:])))
+    nonzero = values[values > 0]
+    metrics = {
+        "periods": n,
+        "observed_periods": int(frame["observed"].sum()),
+        "data_completeness_pct": round(completeness * 100, 2),
+        "total_views": int(round(values.sum())),
+        "mean_period_views": round(float(np.mean(values)), 2) if n else 0,
+        "median_period_views": round(float(np.median(values)), 2) if n else 0,
+        "first_window_vs_last_window_growth_pct": _pct_change(first_mean, last_mean),
+        "recent_yoy_growth_pct": yoy,
+        "trend_pct_per_year": trend_pct,
+        "smoothed_trend_pct_per_year": smoothed_trend_pct,
+        "trend_fit_r2": r2,
+        "trend_label": trend_label,
+        "volatility_mad_over_median": _robust_volatility(nonzero if len(nonzero) else values),
+        "peak_views": int(round(float(np.max(values)))) if n else 0,
+        "peak_date": frame.iloc[int(np.argmax(values))]["date"].date().isoformat() if n else None,
+        "largest_peak_share_pct": round(float(np.max(values)) / max(float(values.sum()), 1) * 100, 2) if n else 0,
+    }
+    return {"metrics": metrics, "anomalies": anomalies, "observations": [{"date": row.date.date().isoformat(), "views": int(round(row.views)), "observed": bool(row.observed)} for row in frame.itertuples()]}
+
+
+def compare_series(series: list[dict[str, Any]], criterion: str = "balanced") -> dict[str, Any]:
+    usable = [item for item in series if item.get("status") == "ok"]
+    rankings = []
+    for item in usable:
+        metrics = item["metrics"]
+        rankings.append({"language": item["language"], "article": item["article"], "trend_label": metrics["trend_label"], "trend_pct_per_year": metrics["trend_pct_per_year"], "reliability": item["reliability"]["level"], "reliability_score": item["reliability"]["score"]})
+    fastest = max((row for row in rankings if row["trend_pct_per_year"] is not None), key=lambda row: row["trend_pct_per_year"], default=None)
+    stable = max(rankings, key=lambda row: row["reliability_score"], default=None)
+    if criterion == "stability":
+        primary = stable
+        rationale = "ranked by evidence quality"
+    elif criterion == "growth":
+        primary = fastest
+        rationale = "ranked by deterministic annualized trend"
+    else:
+        primary = max(rankings, key=lambda row: ((row["reliability_score"] or 0) + min(abs(row["trend_pct_per_year"] or 0), 100) / 2), default=None)
+        rationale = "balanced growth signal and evidence quality"
+    return {"criterion": criterion, "ranking": rankings, "strongest_signal": primary, "fastest_growth": fastest, "most_reliable": stable, "rationale": rationale, "interpretation": "Absolute views indicate article attention, not comparable language-market size."}
