@@ -25,6 +25,11 @@ LIMITATIONS = [
 ]
 
 
+class JsonArgumentParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise InterestError("INVALID_REQUEST", message)
+
+
 def parse_date(value: str, is_end: bool = False) -> date:
     try:
         if len(value) == 7:
@@ -40,7 +45,7 @@ def parse_date(value: str, is_end: bool = False) -> date:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="wikipedia-interest", description="Deterministic Wikipedia Pageviews interest analysis")
+    parser = JsonArgumentParser(prog="wikipedia-interest", description="Deterministic Wikipedia Pageviews interest analysis")
     sub = parser.add_subparsers(dest="command", required=True)
     analyze = sub.add_parser("analyze", help="resolve articles, fetch data, analyse and create a chart")
     analyze.add_argument("--topic")
