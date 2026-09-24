@@ -1,12 +1,14 @@
 {
   "status": "ok",
-  "run_id": "20260924T055401612026Z-bc07ab6a",
+  "run_id": "20260924T142825334945Z-47c8775b",
   "request": {
     "topic": "astronomy",
-    "languages": ["uk"],
+    "languages": [
+      "uk"
+    ],
     "start": "2024-09-01",
     "end": "2026-09-30",
-    "granularity": "monthly",
+    "granularity": "auto",
     "criterion": "balanced",
     "effective_granularity": "monthly",
     "requested_end": "2026-09-30",
@@ -18,10 +20,17 @@
       "language": "uk",
       "project": "uk.wikipedia.org",
       "article": "Астрономія",
+      "pageview_article": "Астрономія",
       "resolution": {
+        "language": "uk",
+        "project": "uk.wikipedia.org",
+        "title": "Астрономія",
+        "url": "https://uk.wikipedia.org/wiki/%D0%90%D1%81%D1%82%D1%80%D0%BE%D0%BD%D0%BE%D0%BC%D1%96%D1%8F",
         "method": "interlanguage_link",
         "confidence": "high",
-        "warnings": []
+        "warnings": [],
+        "pageview_title": "Астрономія",
+        "has_fragment": false
       },
       "status": "ok",
       "metrics": {
@@ -31,6 +40,7 @@
         "total_views": 23322,
         "mean_period_views": 971.75,
         "median_period_views": 611.0,
+        "first_window_vs_last_window_growth_pct": -88.27,
         "recent_yoy_growth_pct": -59.62,
         "trend_pct_per_year": -63.82,
         "smoothed_trend_pct_per_year": -63.58,
@@ -47,7 +57,9 @@
         "reasons": [
           "24 periods provide a long comparison window",
           "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
           "log-linear trend fit is consistent",
+          "period-to-period variation is moderate",
           "1 spike(s) detected; largest is 20.1% of total views",
           "article resolution is high confidence"
         ],
@@ -61,27 +73,177 @@
           "share_of_total_pct": 20.1,
           "influence": "may materially distort the trend"
         }
+      ],
+      "observations": [
+        {
+          "date": "2024-09-01",
+          "views": 4687,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 1776,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 1746,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 1634,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 1558,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 1296,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 1068,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 1019,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 789,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 361,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 305,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 375,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 1642,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 635,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 557,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 622,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 449,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 425,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 410,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 405,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 600,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 281,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 322,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 360,
+          "observed": true
+        }
       ]
     }
   ],
   "comparison": {
     "criterion": "balanced",
+    "ranking": [
+      {
+        "language": "uk",
+        "article": "Астрономія",
+        "trend_label": "declining",
+        "trend_pct_per_year": -63.82,
+        "reliability": "high",
+        "reliability_score": 89
+      }
+    ],
     "strongest_signal": null,
     "strongest_positive_signal": null,
     "fastest_growth": null,
-    "most_reliable": {"language": "uk", "trend_label": "declining", "reliability": "high", "reliability_score": 89},
+    "most_reliable": {
+      "language": "uk",
+      "article": "Астрономія",
+      "trend_label": "declining",
+      "trend_pct_per_year": -63.82,
+      "reliability": "high",
+      "reliability_score": 89
+    },
+    "eligible_series_count": 1,
+    "excluded_series_count": 0,
+    "no_eligible_series": false,
     "no_positive_growth_signal": true,
+    "excluded_low_confidence": [],
     "rationale": "balanced positive growth signal and evidence quality",
     "interpretation": "Absolute views indicate article attention, not comparable language-market size."
   },
   "limitations": [
     "Pageviews measure attention, not people, willingness to pay, conversion or product-market fit.",
     "Absolute views across language editions are not directly comparable as market size.",
+    "A single Wikipedia article may not represent the complete concept; review resolution warnings.",
     "Requested end extends beyond available data; observations were fetched through 2026-08-31."
   ],
+  "partial": false,
+  "languages_requested": 1,
+  "languages_succeeded": 1,
+  "languages_failed": 0,
   "artifacts": {
-    "chart": "chart.png",
-    "report": "report.pdf"
+    "chart": "output/20260924T142825334945Z-47c8775b/chart.png",
+    "data": "output/20260924T142825334945Z-47c8775b/data.csv",
+    "pageviews": "output/20260924T142825334945Z-47c8775b/pageviews.json",
+    "report": "output/20260924T142825334945Z-47c8775b/report.pdf"
   },
   "analysis_version": "0.1"
 }

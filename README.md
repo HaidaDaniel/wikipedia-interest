@@ -1,8 +1,38 @@
 # Wikipedia Interest
 
-Wikipedia Interest is a small Agent Skill and CLI for turning fuzzy audience-research questions into reproducible signals from Wikimedia Pageviews. An agent supplies topic, languages and dates; deterministic Python code resolves Wikipedia articles, retrieves cached data, calculates robust trends and anomalies, assesses evidence quality, and produces a chart or one-page PDF.
+[![tests](https://github.com/HaidaDaniel/wikipedia-interest/actions/workflows/test.yml/badge.svg)](https://github.com/HaidaDaniel/wikipedia-interest/actions/workflows/test.yml)
 
-It is intentionally not a market-size estimator. Wikipedia attention can help choose what to validate next; it cannot prove demand, conversion, willingness to pay or product-market fit.
+Wikipedia Interest is an Agent Skill and CLI that turns audience-research questions into reproducible Wikimedia Pageviews signals. An agent selects a topic, languages and dates; deterministic code resolves articles, calculates trends and evidence quality, and creates charts and one-page PDFs.
+
+Wikipedia attention is an interest signal, not market size or purchase intent.
+
+## Showcase
+
+These examples use the last 36 or 24 complete months as of September 2026. The current incomplete month is excluded; all three runs end on 2026-08-31.
+
+### Mini PC across Wikipedia editions
+
+![Mini PC example](examples/artifacts/mini-pc/chart.png)
+
+English `Mini PC` and Chinese `迷你桌上型電腦` are eligible, but both trends are uncertain with noisy fits. German `Netbook#Nettop` is a section of a broader article whose pageviews cover the whole parent page; the Japanese result is an unrelated iPad article. Both low-confidence proxies are shown for inspection and excluded from comparison.
+
+[View one-page PDF](examples/artifacts/mini-pc/report.pdf) · [View result JSON](examples/artifacts/mini-pc/result.json)
+
+### 3D printing across English, Japanese and Korean
+
+![3D printing example](examples/artifacts/3d-printing/chart.png)
+
+All three editions resolve to high-confidence concept articles. English and Korean pageviews decline; Japanese pageviews grow, but from only about 36 views per month on average with a modest trend fit, so the large percentage change needs further validation. Reliability scores describe evidence quality and do not turn pageviews into market demand.
+
+[View one-page PDF](examples/artifacts/3d-printing/report.pdf) · [View result JSON](examples/artifacts/3d-printing/result.json)
+
+### Astronomy in Ukrainian Wikipedia
+
+![Astronomy example](examples/artifacts/astronomy-uk/chart.png)
+
+The high-confidence `Астрономія` article shows a declining trend across 24 complete months. Evidence quality is high, although a spike in September 2024 accounts for about 20% of the window's views and may affect the fitted trend.
+
+[View one-page PDF](examples/artifacts/astronomy-uk/report.pdf) · [View result JSON](examples/artifacts/astronomy-uk/result.json)
 
 ## Example
 
@@ -33,12 +63,6 @@ JSON + chart + one-page PDF → agent explanation with caveats
 ```
 
 The LLM handles natural language and presentation. It does not write Python, calculate statistics, inspect a large CSV or select formulas.
-
-## Demo
-
-![Example chart](examples/artifacts/astronomy-uk/chart.png)
-
-[Open the committed one-page PDF report](examples/artifacts/astronomy-uk/report.pdf) · [compact example JSON](examples/artifacts/astronomy-uk/result.json)
 
 ## Why this works with a small agent model
 

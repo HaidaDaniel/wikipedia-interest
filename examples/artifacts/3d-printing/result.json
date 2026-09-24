@@ -1,0 +1,634 @@
+{
+  "status": "ok",
+  "run_id": "20260924T142701661450Z-8b89e339",
+  "request": {
+    "topic": "3D printing",
+    "languages": [
+      "en",
+      "ja",
+      "ko"
+    ],
+    "start": "2024-09-01",
+    "end": "2026-09-30",
+    "granularity": "auto",
+    "criterion": "balanced",
+    "effective_granularity": "monthly",
+    "requested_end": "2026-09-30",
+    "data_through": "2026-08-31",
+    "partial_period_excluded": true
+  },
+  "series": [
+    {
+      "language": "en",
+      "project": "en.wikipedia.org",
+      "article": "3D printing",
+      "pageview_article": "3D printing",
+      "resolution": {
+        "language": "en",
+        "project": "en.wikipedia.org",
+        "title": "3D printing",
+        "url": "https://en.wikipedia.org/wiki/3D_printing",
+        "method": "english_exact_plus_interlanguage",
+        "confidence": "high",
+        "warnings": [],
+        "pageview_title": "3D printing",
+        "has_fragment": false
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 24,
+        "observed_periods": 24,
+        "data_completeness_pct": 100.0,
+        "total_views": 690964,
+        "mean_period_views": 28790.17,
+        "median_period_views": 26632.0,
+        "first_window_vs_last_window_growth_pct": -41.79,
+        "recent_yoy_growth_pct": -24.34,
+        "trend_pct_per_year": -28.47,
+        "smoothed_trend_pct_per_year": -28.92,
+        "trend_fit_r2": 0.634,
+        "trend_label": "declining",
+        "volatility_mad_over_median": 0.1662,
+        "peak_views": 51162,
+        "peak_date": "2024-12-01",
+        "largest_peak_share_pct": 7.4
+      },
+      "reliability": {
+        "level": "high",
+        "score": 89,
+        "reasons": [
+          "24 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
+          "log-linear trend fit is consistent",
+          "period-to-period variation is moderate",
+          "1 spike(s) detected; largest is 7.4% of total views",
+          "article resolution is high confidence"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [
+        {
+          "date": "2024-12-01",
+          "views": 51162,
+          "deviation": 3.74,
+          "share_of_total_pct": 7.4,
+          "influence": "worth checking against an external event"
+        }
+      ],
+      "observations": [
+        {
+          "date": "2024-09-01",
+          "views": 34631,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 36257,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 37802,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 51162,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 39657,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 32354,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 37901,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 30236,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 26708,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 22235,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 21086,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 23318,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 31822,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 29265,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 28647,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 26556,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 25958,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 23006,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 22174,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 23357,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 23565,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 21023,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 19433,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 22811,
+          "observed": true
+        }
+      ]
+    },
+    {
+      "language": "ja",
+      "project": "ja.wikipedia.org",
+      "article": "3Dプリント",
+      "pageview_article": "3Dプリント",
+      "resolution": {
+        "language": "ja",
+        "project": "ja.wikipedia.org",
+        "title": "3Dプリント",
+        "url": "https://ja.wikipedia.org/wiki/3D%E3%83%97%E3%83%AA%E3%83%B3%E3%83%88",
+        "method": "interlanguage_link",
+        "confidence": "high",
+        "warnings": [],
+        "pageview_title": "3Dプリント",
+        "has_fragment": false
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 24,
+        "observed_periods": 24,
+        "data_completeness_pct": 100.0,
+        "total_views": 872,
+        "mean_period_views": 36.33,
+        "median_period_views": 42.0,
+        "first_window_vs_last_window_growth_pct": 522.22,
+        "recent_yoy_growth_pct": 29.47,
+        "trend_pct_per_year": 116.76,
+        "smoothed_trend_pct_per_year": 106.24,
+        "trend_fit_r2": 0.316,
+        "trend_label": "growing",
+        "volatility_mad_over_median": 0.2619,
+        "peak_views": 63,
+        "peak_date": "2026-04-01",
+        "largest_peak_share_pct": 7.22
+      },
+      "reliability": {
+        "level": "high",
+        "score": 93,
+        "reasons": [
+          "24 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
+          "trend fit is moderately consistent",
+          "period-to-period variation is moderate",
+          "no robust spike detected",
+          "article resolution is high confidence"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [],
+      "observations": [
+        {
+          "date": "2024-09-01",
+          "views": 8,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 6,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 4,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 3,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 17,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 51,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 53,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 60,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 50,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 42,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 43,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 43,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 51,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 42,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 43,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 27,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 43,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 28,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 21,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 63,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 62,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 40,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 31,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 41,
+          "observed": true
+        }
+      ]
+    },
+    {
+      "language": "ko",
+      "project": "ko.wikipedia.org",
+      "article": "3차원 인쇄",
+      "pageview_article": "3차원 인쇄",
+      "resolution": {
+        "language": "ko",
+        "project": "ko.wikipedia.org",
+        "title": "3차원 인쇄",
+        "url": "https://ko.wikipedia.org/wiki/3%EC%B0%A8%EC%9B%90_%EC%9D%B8%EC%87%84",
+        "method": "interlanguage_link",
+        "confidence": "high",
+        "warnings": [],
+        "pageview_title": "3차원 인쇄",
+        "has_fragment": false
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 24,
+        "observed_periods": 24,
+        "data_completeness_pct": 100.0,
+        "total_views": 6385,
+        "mean_period_views": 266.04,
+        "median_period_views": 219.5,
+        "first_window_vs_last_window_growth_pct": -79.09,
+        "recent_yoy_growth_pct": -55.71,
+        "trend_pct_per_year": -55.83,
+        "smoothed_trend_pct_per_year": -55.88,
+        "trend_fit_r2": 0.787,
+        "trend_label": "declining",
+        "volatility_mad_over_median": 0.3872,
+        "peak_views": 588,
+        "peak_date": "2024-10-01",
+        "largest_peak_share_pct": 9.21
+      },
+      "reliability": {
+        "level": "high",
+        "score": 100,
+        "reasons": [
+          "24 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
+          "log-linear trend fit is consistent",
+          "period-to-period variation is moderate",
+          "no robust spike detected",
+          "article resolution is high confidence"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [],
+      "observations": [
+        {
+          "date": "2024-09-01",
+          "views": 524,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 588,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 509,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 329,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 399,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 239,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 515,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 386,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 298,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 225,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 214,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 199,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 259,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 199,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 257,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 142,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 107,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 106,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 205,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 168,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 178,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 110,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 101,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 128,
+          "observed": true
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "criterion": "balanced",
+    "ranking": [
+      {
+        "language": "en",
+        "article": "3D printing",
+        "trend_label": "declining",
+        "trend_pct_per_year": -28.47,
+        "reliability": "high",
+        "reliability_score": 89
+      },
+      {
+        "language": "ja",
+        "article": "3Dプリント",
+        "trend_label": "growing",
+        "trend_pct_per_year": 116.76,
+        "reliability": "high",
+        "reliability_score": 93
+      },
+      {
+        "language": "ko",
+        "article": "3차원 인쇄",
+        "trend_label": "declining",
+        "trend_pct_per_year": -55.83,
+        "reliability": "high",
+        "reliability_score": 100
+      }
+    ],
+    "strongest_signal": {
+      "language": "ja",
+      "article": "3Dプリント",
+      "trend_label": "growing",
+      "trend_pct_per_year": 116.76,
+      "reliability": "high",
+      "reliability_score": 93
+    },
+    "strongest_positive_signal": {
+      "language": "ja",
+      "article": "3Dプリント",
+      "trend_label": "growing",
+      "trend_pct_per_year": 116.76,
+      "reliability": "high",
+      "reliability_score": 93
+    },
+    "fastest_growth": {
+      "language": "ja",
+      "article": "3Dプリント",
+      "trend_label": "growing",
+      "trend_pct_per_year": 116.76,
+      "reliability": "high",
+      "reliability_score": 93
+    },
+    "most_reliable": {
+      "language": "ko",
+      "article": "3차원 인쇄",
+      "trend_label": "declining",
+      "trend_pct_per_year": -55.83,
+      "reliability": "high",
+      "reliability_score": 100
+    },
+    "eligible_series_count": 3,
+    "excluded_series_count": 0,
+    "no_eligible_series": false,
+    "no_positive_growth_signal": false,
+    "excluded_low_confidence": [],
+    "rationale": "balanced positive growth signal and evidence quality",
+    "interpretation": "Absolute views indicate article attention, not comparable language-market size."
+  },
+  "limitations": [
+    "Pageviews measure attention, not people, willingness to pay, conversion or product-market fit.",
+    "Absolute views across language editions are not directly comparable as market size.",
+    "A single Wikipedia article may not represent the complete concept; review resolution warnings.",
+    "Requested end extends beyond available data; observations were fetched through 2026-08-31."
+  ],
+  "partial": false,
+  "languages_requested": 3,
+  "languages_succeeded": 3,
+  "languages_failed": 0,
+  "artifacts": {
+    "chart": "output/20260924T142701661450Z-8b89e339/chart.png",
+    "data": "output/20260924T142701661450Z-8b89e339/data.csv",
+    "pageviews": "output/20260924T142701661450Z-8b89e339/pageviews.json",
+    "report": "output/20260924T142701661450Z-8b89e339/report.pdf"
+  },
+  "analysis_version": "0.1"
+}

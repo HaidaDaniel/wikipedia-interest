@@ -1,46 +1,37 @@
-# Scenario examples
+# Reproduce the showcase
 
-These are intentionally reproducible commands. They use live Wikimedia data on first run and then the local cache. Dates below are the brief's “last approximately two years” shape; change them when reproducing.
+The committed artifacts in [`artifacts/`](artifacts/) came from three OpenCode agent runs using the `wikipedia-interest` skill and deterministic CLI on 2026-09-24. OpenCode read the compact `analyze` JSON, then ran `report`; it did not calculate metrics from `data.csv`. The requested end month, September 2026, was incomplete and excluded, so all data ends on 2026-08-31. Live Wikimedia data may change if these commands are rerun later.
 
-## A — intermittent fasting, Polish vs Czech
+Run these commands from the repository root. Each `analyze` command prints its run path; use that path with `report`.
 
-```bash
-uv run wikipedia-interest analyze \
-  --topic "intermittent fasting" --languages pl,cs \
-  --start 2024-09 --end 2026-09 --granularity monthly
-```
-
-Expected behavior: English canonical search plus interlanguage links should resolve the Czech article; Polish may be unresolved or low-confidence if the edition has no exact concept page. Check `resolution.warnings`; do not assume equal article coverage means equal audience size. Compare `trend_pct_per_year`, `trend_label` and `reliability`.
-
-## B — astronomy, Ukrainian
+## Mini PC: four editions, 36 complete months
 
 ```bash
-uv run wikipedia-interest analyze \
-  --topic astronomy --languages uk \
-  --start 2024-09 --end 2026-09 --granularity monthly
-```
-
-Expected behavior: resolve the Ukrainian interlanguage article, return a trend label and explain whether the signal remains reliable after missing-period and spike checks.
-
-## C — learning English, several editions + PDF
-
-```bash
-uv run wikipedia-interest analyze \
-  --topic "learning English" --languages pl,uk,es,de \
-  --start 2024-09 --end 2026-09 --criterion stability
+uv run wikipedia-interest analyze --topic "mini PCs" --languages en,de,ja,zh \
+  --start 2023-09 --end 2026-09 --granularity auto --output output
 uv run wikipedia-interest report --run output/<run-id>
 ```
 
-“Learning English” can map to different concepts (language learning, English language, or a course). The resolver may return a low-confidence search result or warning. That ambiguity is part of the result and should be resolved before making a product decision.
+The German result points to `Netbook#Nettop`, while pageviews cover the parent `Netbook` article. The Japanese search result points to an iPad article. Both are low-confidence candidates excluded from comparison; only English and Chinese are eligible. [Chart](artifacts/mini-pc/chart.png) · [PDF](artifacts/mini-pc/report.pdf) · [JSON](artifacts/mini-pc/result.json)
 
-## Cheap-model validation prompt
+## 3D printing: three editions, 24 complete months
 
-Use this prompt with a tool-capable model after placing the skill in its skill directory:
+```bash
+uv run wikipedia-interest analyze --topic "3D printing" --languages en,ja,ko \
+  --start 2024-09 --end 2026-09 --granularity auto --output output
+uv run wikipedia-interest report --run output/<run-id>
+```
 
-> Analyze whether interest in intermittent fasting is growing in Polish and Czech Wikipedia from 2024-09 through 2026-09. Use the Wikipedia Interest skill. Run the deterministic `analyze` command, read only its compact JSON, compare trend and reliability, and explain the article-resolution warnings and cross-language caveat. Do not calculate statistics yourself. Offer a PDF only if requested.
+All three articles resolve with high confidence. Japanese pageviews rise from a small baseline and have a modest trend fit, so the percentage change is provisional even though the heuristic reliability score is high. [Chart](artifacts/3d-printing/chart.png) · [PDF](artifacts/3d-printing/report.pdf) · [JSON](artifacts/3d-printing/result.json)
 
-Expected flow: parse flags → run CLI → read `comparison` and per-series fields → give a conservative answer. This flow was validated with OpenCode and `opencode/mimo-v2.6-flash-free`; Claude Haiku was attempted separately but its provider reported insufficient account funds.
+## Astronomy: Ukrainian edition, 24 complete months
 
-## Validation note
+```bash
+uv run wikipedia-interest analyze --topic astronomy --languages uk \
+  --start 2024-09 --end 2026-09 --granularity auto --output output
+uv run wikipedia-interest report --run output/<run-id>
+```
 
-On 2026-09-24, all three scenarios completed against live Wikimedia data. Scenario B resolved `uk.wikipedia.org/Астрономія`; its committed chart and one-page PDF are in `examples/artifacts/astronomy-uk/`. Scenario A resolved Czech to `Přerušovaný půst`; Polish used an explicitly low-confidence target-search result and is excluded from comparison. Scenario C exercised four languages and generated both chart and one-page PDF; all four target-search resolutions are low confidence and the output explicitly warns that “learning English” is ambiguous.
+The high-confidence `Астрономія` article shows a decline, with one prominent spike at the start of the window. [Chart](artifacts/astronomy-uk/chart.png) · [PDF](artifacts/astronomy-uk/report.pdf) · [JSON](artifacts/astronomy-uk/result.json)
+
+Pageviews measure article attention. Cross-language totals do not measure market size, and `trend_fit_r2` describes fit rather than statistical significance.
