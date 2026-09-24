@@ -132,4 +132,4 @@ Phase 2: Wikidata concept graphs, related-page groups, normalized language-audie
 
 ## Reviewer path
 
-Open the root `SKILL.md` for agent instructions, `PLAN.md` for architecture, `METHODOLOGY.md` for formulas, `src/wikipedia_interest/cli.py` for the contract, and `examples/README.md` for real scenario commands. The GitHub repository rename from the historical typo to `wikipedia-interest` is a one-time manual owner action; no duplicate skill source is required.
+Open the root `SKILL.md` for agent instructions, `PLAN.md` for architecture, `METHODOLOGY.md` for formulas, `src/wikipedia_interest/cli.py` for the contract, and `examples/README.md` for real scenario commands.

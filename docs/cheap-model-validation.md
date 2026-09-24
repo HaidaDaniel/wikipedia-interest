@@ -38,8 +38,7 @@ Status: **passed** with the configured local Llama.cpp provider.
 
 - Date: 2026-09-24
 - Harness: OpenCode 1.18.31
-- Provider/model: `llamacpp95//home/virtusdno/llama-models/Qwen3.8-27B-UD-Q4_K_M.gguf`
-- Endpoint: `http://192.168.0.95:8000/v1`
+- Provider/model: local llama.cpp + `Qwen3.8-27B-UD-Q4_K_M`
 - Working directory: repository root
 
 The same prompt completed end to end through the local model: it discovered the skill, ran `analyze`, read the compact JSON, ran `report`, and returned a conservative answer. The generated report was `output/20260924T064010989656Z-bc07ab6a/report.pdf`; it is a one-page PDF. The result matched the deterministic CLI: `Астрономія`, declining approximately `-63.8%/yr`, high reliability score `89`, with data through `2026-08-31`.

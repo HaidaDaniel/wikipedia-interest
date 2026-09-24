@@ -4,9 +4,8 @@ Status: **PASS**
 
 - Date: 2026-09-24
 - Harness: OpenCode 1.18.31
-- Model: `Qwen3.8-27B-UD-Q4_K_M.gguf`
-- Provider: `llamacpp95` / llama.cpp OpenAI-compatible endpoint
-- Endpoint: `http://192.168.0.95:8000/v1`
+- Model: `Qwen3.8-27B-UD-Q4_K_M`
+- Provider: local llama.cpp OpenAI-compatible provider
 - Working directory: repository root
 
 ## Prompt

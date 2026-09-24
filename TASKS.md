@@ -20,4 +20,4 @@
 - [x] local Qwen OpenCode validation
 - [x] single canonical root `SKILL.md` with OpenCode discovery symlink
 - [x] split free/local validation evidence
-- [ ] rename GitHub repository to `wikipedia-interest` — requires manual GitHub owner action
+- [x] rename GitHub repository to `wikipedia-interest`
