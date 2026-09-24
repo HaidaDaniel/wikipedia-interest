@@ -95,5 +95,12 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
             else:
                 reason = "target-language search was unavailable" if search_unavailable else "no confident article match found"
                 item_method, item_confidence, item_warnings = "unresolved", "low", [f"{reason} for language '{language}'."]
+        if title and hasattr(client, "is_disambiguation"):
+            try:
+                if client.is_disambiguation(language, title):
+                    item_confidence = "low"
+                    item_warnings.append("Resolved title is a Wikipedia disambiguation page; treat it as a low-confidence candidate and verify the intended concept.")
+            except InterestError:
+                item_warnings.append("Could not verify whether the resolved title is a disambiguation page; review the article before using its metrics.")
         resolved.append(ResolvedArticle(language, f"{language}.wikipedia.org", title, f"https://{language}.wikipedia.org/wiki/{quote(title.replace(' ', '_'), safe='') }" if title else None, item_method, item_confidence, item_warnings))
     return resolved

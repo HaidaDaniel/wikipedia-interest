@@ -51,3 +51,14 @@ def test_permanent_404_is_not_retried(tmp_path):
     finally:
         client.close()
     assert len(calls) == 1
+
+
+def test_disambiguation_pageprops_are_detected(tmp_path):
+    def handler(request):
+        return httpx.Response(200, json={"query": {"pages": {"1": {"pageprops": {"disambiguation": ""}}}}})
+
+    client = WikimediaClient(FileCache(tmp_path), http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    try:
+        assert client.is_disambiguation("en", "Claude") is True
+    finally:
+        client.close()

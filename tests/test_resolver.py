@@ -74,3 +74,22 @@ def test_weak_english_top_match_is_low_confidence():
     assert result[0].title == "Self-hosting (compilers)"
     assert result[0].confidence == "low"
     assert any("weak lexical overlap" in warning for warning in result[0].warnings)
+
+
+class DisambiguationClient(FakeClient):
+    def search(self, language, query, limit=5):
+        if language in {"en", "fr"}:
+            return [{"title": "Claude"}]
+        return []
+
+    def langlinks(self, language, title):
+        return {}
+
+    def is_disambiguation(self, language, title):
+        return title == "Claude"
+
+
+def test_disambiguation_pages_are_low_confidence_candidates():
+    result = resolve_topic("Claude", ["en", "fr"], DisambiguationClient())
+    assert [item.confidence for item in result] == ["low", "low"]
+    assert all(any("disambiguation page" in warning for warning in item.warnings) for item in result)

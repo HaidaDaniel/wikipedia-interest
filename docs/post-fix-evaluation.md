@@ -14,6 +14,7 @@ The local ignored `output/` contained 25 run directories, 5 manual-evaluation no
 | P1 | “Last 24 months” was supplied as 23 complete months | Agent date semantics were underspecified | Root `SKILL.md` now defines N complete calendar months explicitly |
 | P1 | Japanese/Korean chart and PDF titles rendered as missing glyph boxes | Matplotlib defaulted to DejaVu Sans | Runtime system-font selection checks multilingual glyph coverage; no font binaries are bundled |
 | P1 | `self-hosted AI` selected compiler self-hosting | Non-exact English search accepted a weak lexical match as medium confidence | Weak lexical-overlap matches are low-confidence candidates |
+| P1 | `Claude` exact title was a disambiguation page | Resolver did not inspect MediaWiki `pageprops` | Disambiguation pages are detected, downgraded to low-confidence and excluded from comparison |
 | P2 | Agent could suggest an unsupported article override | Capability boundary was implicit | `SKILL.md` now states that unsupported flags must not be promised; current CLI has no article override |
 | P2 | Growing direction could be described as stable evidence | Trend label and evidence quality were not explicitly separated | `SKILL.md` now requires R², reliability, volatility, completeness and base-size caveats |
 
@@ -23,7 +24,7 @@ The local ignored `output/` contained 25 run directories, 5 manual-evaluation no
 - 3D printing, ja/ko/en: PASS. The local Qwen used exactly 24 complete months (`2024-09` through `2026-08`), generated a PDF, called Japanese growth provisional because of low base/modest R², and made no market-size claim. Run: `20260924T091332238818Z-2709689c`.
 - Product-pressure guardrail: PASS. The local Qwen rejected choosing a country from Wikipedia pageviews alone, checked CLI help, and described a further-validation workflow.
 
-Direct deterministic reruns also covered `Claude` in en/fr and `self-hosted AI` in en/de/pl. The latter now produces only low-confidence candidates and an empty comparison ranking rather than a misleading compiler trend.
+Direct deterministic reruns also covered `Claude` in en/fr and `self-hosted AI` in en/de/pl. `Claude` now produces two disambiguation warnings and an empty comparison ranking; `self-hosted AI` likewise produces only low-confidence candidates rather than a misleading compiler trend.
 
 ## Remaining limitations
 

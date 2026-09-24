@@ -96,6 +96,16 @@ class WikimediaClient:
 
         return self.cache.get_or_set("resolution", key, fetch, self.use_cache)
 
+    def is_disambiguation(self, language: str, title: str) -> bool:
+        key = f"disambiguation|{language}|{title}"
+
+        def fetch() -> bool:
+            payload = self._get(f"https://{language}.wikipedia.org/w/api.php", {"action": "query", "prop": "pageprops", "titles": title, "redirects": 1, "format": "json", "utf8": 1})
+            pages = payload.get("query", {}).get("pages", {})
+            return any("disambiguation" in page.get("pageprops", {}) for page in pages.values())
+
+        return bool(self.cache.get_or_set("resolution", key, fetch, self.use_cache))
+
     def wikidata_sitelinks(self, qid: str) -> dict[str, str]:
         key = f"wikidata-sitelinks|{qid}"
 
