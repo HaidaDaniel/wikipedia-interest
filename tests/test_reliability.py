@@ -9,3 +9,8 @@ def test_reliability_penalizes_spikes_and_low_resolution():
     assert spiky["score"] < clean["score"]
     assert "spike" in " ".join(spiky["reasons"])
 
+
+def test_stable_flat_series_can_have_high_evidence_quality():
+    metrics = {"periods": 24, "data_completeness_pct": 100, "trend_pct_per_year": 0, "trend_fit_r2": 1.0, "volatility_mad_over_median": 0.0}
+    result = assess_reliability(metrics, [], "high")
+    assert result["level"] == "high"

@@ -1,3 +1,5 @@
+import json
+
 from wikipedia_interest.runs import inspect_summary, make_run_dir, write_json
 
 
@@ -9,3 +11,9 @@ def test_run_persistence_and_compact_summary(tmp_path):
     assert summary["run_id"] == run_id
     assert summary["series"][0]["trend"] == "flat"
 
+
+def test_json_writer_converts_non_finite_numbers_to_null(tmp_path):
+    path = tmp_path / "safe.json"
+    write_json(path, {"nan": float("nan"), "infinity": float("inf")})
+    payload = json.loads(path.read_text())
+    assert payload == {"nan": None, "infinity": None}

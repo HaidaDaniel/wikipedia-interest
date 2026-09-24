@@ -2,17 +2,28 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 def write_json(path: Path, value: Any) -> None:
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(_json_safe(value), ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value
 
 
 def make_run_dir(output_root: str | Path, request: dict[str, Any]) -> tuple[str, Path]:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     short_hash = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()[:8]
     run_id = f"{stamp}-{short_hash}"
     path = Path(output_root) / run_id
@@ -39,4 +50,3 @@ def inspect_summary(result: dict[str, Any]) -> dict[str, Any]:
         "comparison": result.get("comparison"),
         "artifacts": result.get("artifacts"),
     }
-

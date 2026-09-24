@@ -38,15 +38,15 @@ Stdout is one JSON object and stderr contains human-readable operational errors 
 
 ## Cache and persistence
 
-Cache entries live in `.cache/` and are keyed by endpoint inputs, project, article, access, agent, granularity and dates. A cache hit avoids network access; there is a `--no-cache` escape hatch. A run is `output/<UTC timestamp>-<short hash>/` containing request, metadata, result, normalized CSV and chart. The raw API payload is saved for auditability. Generated output is ignored by git except the directory marker.
+Cache entries live in `.cache/` and are keyed by endpoint inputs, project, article, access, agent, granularity and dates. A cache hit avoids network access; there is a `--no-cache` escape hatch. A run is `output/<UTC timestamp>-<short hash>/` containing request, metadata, full result, normalized CSV, normalized pageviews JSON and chart. `pageviews.json` is intentionally named as normalized data, not claimed to be an untouched API payload. Generated output is ignored by git except the directory marker.
 
 ## Resolution
 
-The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. It falls back to a target-language search only when necessary. Exact/linked matches are high confidence, a top search match is medium or low with warnings, and unresolved languages are explicit errors rather than silent substitutions.
+The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. Wikidata is queried only when requested languages are missing from langlinks. It falls back to a target-language search only when necessary. Exact/linked matches are high/medium confidence, a top search match is low confidence with an explicit warning, and unresolved languages are explicit errors rather than silent substitutions.
 
 ## Statistical methodology
 
-Monthly is the default for spans over 180 days; daily is used for shorter spans. Missing expected periods are materialized as zero for plotting and completeness accounting. Metrics include robust level statistics, first-vs-last window growth, 12-period YoY where possible, log-linear annualized trend, smoothed trend, volatility, completeness and robust spike detection. Trend labels use documented thresholds, not an LLM judgement.
+Monthly is the default for spans over 180 days; daily is used for shorter spans. The current incomplete period is excluded. Missing expected periods remain null/gapped for plotting and are excluded from calculations. Metrics include robust level statistics, first-vs-last window growth, 12-period YoY where possible, log-linear annualized trend, smoothed trend, volatility, completeness and robust spike detection. Trend labels use documented thresholds, not an LLM judgement. Analyze stdout is compact; full observations remain in `result.json` and can be requested with `--verbose-json`.
 
 ## Reliability methodology
 
@@ -59,4 +59,3 @@ Matplotlib creates both the chart and a single-page PDF without a browser. Unit 
 ## Limitations and next stages
 
 Pageviews are attention, not willingness to pay. Cross-language absolute counts are not market size. One article may underrepresent a concept, and events, seasonality, bots and coverage differences remain. Future phases: topic groups, Wikidata concept graphs, normalized audience signals, external validation sources, event annotation, batch ranking and backtesting against product outcomes.
-

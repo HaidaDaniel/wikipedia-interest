@@ -1,0 +1,87 @@
+{
+  "status": "ok",
+  "run_id": "20260924T055401612026Z-bc07ab6a",
+  "request": {
+    "topic": "astronomy",
+    "languages": ["uk"],
+    "start": "2024-09-01",
+    "end": "2026-09-30",
+    "granularity": "monthly",
+    "criterion": "balanced",
+    "effective_granularity": "monthly",
+    "requested_end": "2026-09-30",
+    "data_through": "2026-08-31",
+    "partial_period_excluded": true
+  },
+  "series": [
+    {
+      "language": "uk",
+      "project": "uk.wikipedia.org",
+      "article": "Астрономія",
+      "resolution": {
+        "method": "interlanguage_link",
+        "confidence": "high",
+        "warnings": []
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 24,
+        "observed_periods": 24,
+        "data_completeness_pct": 100.0,
+        "total_views": 23322,
+        "mean_period_views": 971.75,
+        "median_period_views": 611.0,
+        "recent_yoy_growth_pct": -59.62,
+        "trend_pct_per_year": -63.82,
+        "smoothed_trend_pct_per_year": -63.58,
+        "trend_fit_r2": 0.656,
+        "trend_label": "declining",
+        "volatility_mad_over_median": 0.4419,
+        "peak_views": 4687,
+        "peak_date": "2024-09-01",
+        "largest_peak_share_pct": 20.1
+      },
+      "reliability": {
+        "level": "high",
+        "score": 89,
+        "reasons": [
+          "24 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "log-linear trend fit is consistent",
+          "1 spike(s) detected; largest is 20.1% of total views",
+          "article resolution is high confidence"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [
+        {
+          "date": "2024-09-01",
+          "views": 4687,
+          "deviation": 10.18,
+          "share_of_total_pct": 20.1,
+          "influence": "may materially distort the trend"
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "criterion": "balanced",
+    "strongest_signal": null,
+    "strongest_positive_signal": null,
+    "fastest_growth": null,
+    "most_reliable": {"language": "uk", "trend_label": "declining", "reliability": "high", "reliability_score": 89},
+    "no_positive_growth_signal": true,
+    "rationale": "balanced positive growth signal and evidence quality",
+    "interpretation": "Absolute views indicate article attention, not comparable language-market size."
+  },
+  "limitations": [
+    "Pageviews measure attention, not people, willingness to pay, conversion or product-market fit.",
+    "Absolute views across language editions are not directly comparable as market size.",
+    "Requested end extends beyond available data; observations were fetched through 2026-08-31."
+  ],
+  "artifacts": {
+    "chart": "chart.png",
+    "report": "report.pdf"
+  },
+  "analysis_version": "0.1"
+}

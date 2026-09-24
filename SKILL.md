@@ -1,7 +1,7 @@
 ---
 name: wikipedia-interest
 description: Analyze audience interest in arbitrary topics across Wikipedia language editions using deterministic Wikimedia Pageviews retrieval, trend metrics, anomaly detection, evidence-quality scoring, charts and one-page PDF reports. Use when a user asks whether interest is growing, compares languages or time ranges, requests a follow-up analysis, graph, or shareable research brief. Do not use pageviews alone to claim market size, willingness to pay, conversion or product-market fit.
-compatibility: Requires Python 3.12+, uv, network access to Wikimedia APIs, and a writable local workspace. Run commands from the skill root.
+compatibility: Requires Python 3.12+, uv, network access to Wikimedia APIs, and a writable local workspace. Run commands from the repository root containing pyproject.toml.
 metadata:
   version: "0.1.0"
   source: "Wikimedia Pageviews API"
@@ -20,15 +20,15 @@ Use this skill for questions such as “is interest in astronomy growing in Ukra
    uv run wikipedia-interest analyze --topic "intermittent fasting" --languages pl,cs --start 2024-09 --end 2026-09 --granularity auto --output output
    ```
 
-3. Read the single JSON object on stdout. Do not inspect `data.csv` to calculate metrics. Use `series[].resolution`, `series[].metrics`, `series[].anomalies`, `series[].reliability`, `comparison`, and `limitations`.
+3. Read the single compact JSON object on stdout. Full observations are persisted in `output/<run-id>/result.json`; use `--verbose-json` only when explicitly needed. Do not inspect `data.csv` to calculate metrics. Use `series[].resolution`, `series[].metrics`, `series[].anomalies`, `series[].reliability`, `comparison`, and `limitations`.
 4. Mention resolution warnings and evidence quality. Describe outputs as “interest signal” or “worth further validation”, never as confirmed market demand.
 5. For a human-shareable brief, run `uv run wikipedia-interest report --run output/<run-id>`. For a short follow-up context, run `uv run wikipedia-interest inspect-run output/<run-id>`.
 
 ## Output contract
 
-Successful `analyze` output has `status`, `run_id`, `request`, `series`, `comparison`, `limitations`, and `artifacts`. Each successful series contains `language`, `project`, `article`, `resolution`, `metrics`, `reliability`, `anomalies`, and compact `observations`. `metrics.trend_label` is one of `growing`, `declining`, `flat`, or `uncertain`; `reliability.level` is `high`, `medium`, or `low`. The reliability score is evidence quality, not a confidence interval.
+Successful `analyze` output has `status`, `run_id`, `request`, `series`, `comparison`, `limitations`, and `artifacts`. Each successful series contains `language`, `project`, `article`, `resolution`, `metrics`, `reliability`, and `anomalies`; full observations are in persisted `result.json`, not default stdout. `metrics.trend_label` is one of `growing`, `declining`, `flat`, or `uncertain`; `reliability.level` is `high`, `medium`, or `low`. The reliability score is evidence quality, not a confidence interval.
 
-Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to stderr. Useful codes include `INVALID_DATE_RANGE`, `ARTICLE_NOT_FOUND`, `NO_DATA`, `WIKIMEDIA_API_ERROR`, and `INSUFFICIENT_DATA`.
+Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to stderr. Useful codes include `INVALID_REQUEST`, `INVALID_DATE`, `INVALID_DATE_RANGE`, `INVALID_LANGUAGES`, `INVALID_TOPIC`, `ARTICLE_NOT_FOUND`, `NO_DATA`, `WIKIMEDIA_API_ERROR`, and `LOCAL_ERROR`.
 
 ## Follow-ups and assumptions
 
@@ -39,9 +39,10 @@ Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to st
 
 `--from-run` reuses the prior request fields and the filesystem cache but always creates a new run directory. Cached retrieval is keyed by project, article, access, agent, granularity and date range.
 
+Monthly analysis excludes the current incomplete calendar month and returns `request.data_through` plus `request.partial_period_excluded`. Missing periods are `views: null, observed: false`; genuine zero observations remain `views: 0, observed: true`. If some languages fail, continue with successful series and mention `partial`, `languages_failed`, and resolution warnings. If all fail, report the machine-readable `NO_DATA` error.
+
 ## Interpretation guardrails
 
 Always distinguish absolute article attention, growth dynamics and evidence quality. Cross-language totals are not market size because editions differ in audience, coverage, naming and traffic mix. A spike, unresolved/low-confidence article, incomplete periods or `uncertain` trend must be stated. Recommend external validation such as interviews, search demand, product analytics or conversion research before product decisions.
 
 For implementation details, see `METHODOLOGY.md`; for the exact project design, see `PLAN.md`.
-

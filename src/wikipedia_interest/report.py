@@ -14,10 +14,11 @@ from .charts import create_chart
 
 
 def _finding(series: dict[str, Any]) -> str:
-    m = series["metrics"]
-    growth = m.get("trend_pct_per_year")
+    metrics = series.get("metrics", {})
+    growth = metrics.get("trend_pct_per_year")
     growth_text = "trend unavailable" if growth is None else f"{growth:+.1f}% annualized trend"
-    return f"{series['language']}: {m['trend_label']}; {growth_text}; evidence {series['reliability']['level']} ({series['reliability']['score']}/100)."
+    reliability = series.get("reliability", {})
+    return f"{series.get('language', '?')}: {metrics.get('trend_label', 'uncertain')}; {growth_text}; evidence {reliability.get('level', 'unknown')} ({reliability.get('score', 'n/a')}/100)."
 
 
 def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
@@ -26,43 +27,62 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     if not chart_path.exists():
         create_chart(result, chart_path)
     report_path = run_dir / "report.pdf"
+    successful = [series for series in result.get("series", []) if series.get("status") == "ok" and "metrics" in series]
+    failed = [series for series in result.get("series", []) if series.get("status") != "ok"]
+    if not successful:
+        raise ValueError("cannot create a report without a successful series")
+
     fig = plt.figure(figsize=(8.27, 11.69))
     fig.patch.set_facecolor("white")
+    request = result.get("request", {})
     fig.text(0.07, 0.965, "Wikipedia Interest Brief", fontsize=19, weight="bold", color="#111827")
-    fig.text(0.07, 0.942, result["request"]["topic"], fontsize=12, color="#374151")
-    fig.text(0.07, 0.912, f"Question: compare pageview interest from {result['request']['start']} to {result['request']['end']}", fontsize=8.5, color="#4b5563")
+    fig.text(0.07, 0.942, request.get("topic", "topic"), fontsize=12, color="#374151")
+    fig.text(0.07, 0.912, f"Question: compare pageview interest from {request.get('start')} to {request.get('end')}", fontsize=8.5, color="#4b5563")
     chart = plt.imread(chart_path)
     ax_chart = fig.add_axes([0.07, 0.55, 0.86, 0.31])
     ax_chart.imshow(chart)
     ax_chart.axis("off")
     fig.text(0.07, 0.525, "Key findings", fontsize=11, weight="bold", color="#111827")
     y = 0.498
-    for series in result.get("series", [])[:4]:
+    for series in successful[:4]:
         fig.text(0.085, y, "• " + _finding(series), fontsize=8.5, color="#1f2937", wrap=True)
         y -= 0.031
+    for series in failed[:4]:
+        fig.text(0.085, y, f"• {series.get('language', '?')}: unresolved/excluded ({series.get('error_code', 'error')}).", fontsize=8.2, color="#b45309", wrap=True)
+        y -= 0.027
+
     comparison = result.get("comparison", {})
     strongest = comparison.get("strongest_signal")
-    if strongest:
-        fig.text(0.07, y - 0.005, f"Suggested next signal: {strongest['language']} ({comparison.get('rationale', 'balanced comparison')}).", fontsize=8.5, color="#1d4ed8")
+    if comparison.get("criterion") == "stability" and strongest:
+        recommendation = f"Most reliable evidence: {strongest['language']} (stability criterion)."
+    elif strongest:
+        recommendation = f"Strongest positive signal for further validation: {strongest['language']}."
+    else:
+        recommendation = "No clear positive growth signal was found in this comparison."
+    fig.text(0.07, y - 0.005, recommendation, fontsize=8.5, color="#1d4ed8")
+
     table_y = y - 0.055
     fig.text(0.07, table_y + 0.035, "Compact comparison", fontsize=10, weight="bold", color="#111827")
-    columns = ["Language", "Article", "Total", "Trend", "Evidence"]
+    columns = ["Language", "Article/status", "Total", "Trend", "Evidence"]
     rows = []
-    for series in result.get("series", []):
-        m = series["metrics"]
-        rows.append([series["language"], series.get("article", "")[:22], f"{m['total_views']:,}", m["trend_label"], series["reliability"]["level"]])
+    for series in successful:
+        metrics = series["metrics"]
+        rows.append([series["language"], series.get("article", "")[:22], f"{metrics.get('total_views', 0):,}", metrics.get("trend_label", "uncertain"), series.get("reliability", {}).get("level", "n/a")])
+    for series in failed:
+        rows.append([series.get("language", "?"), "unresolved / excluded", "—", "—", "—"])
     if rows:
         ax_table = fig.add_axes([0.07, table_y - 0.11, 0.86, 0.105])
         ax_table.axis("off")
         table = ax_table.table(cellText=rows, colLabels=columns, loc="center", cellLoc="left", colLoc="left")
         table.auto_set_font_size(False)
-        table.set_fontsize(7.5)
-        table.scale(1, 1.55)
+        table.set_fontsize(7.0 if len(rows) > 4 else 7.5)
+        table.scale(1, 1.45)
         for (row, col), cell in table.get_celld().items():
             cell.set_edgecolor("#d1d5db")
             if row == 0:
                 cell.set_facecolor("#eff6ff")
                 cell.set_text_props(weight="bold")
+
     fig.text(0.07, 0.19, "Caveats", fontsize=10, weight="bold", color="#111827")
     caveat = "Wikipedia pageviews are attention, not market size, willingness to pay, conversion, or product-market fit. Cross-language totals are not directly comparable; inspect article coverage and validate with external research."
     fig.text(0.07, 0.165, caveat, fontsize=8, color="#4b5563", wrap=True, linespacing=1.35)
@@ -72,4 +92,3 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
         pdf.savefig(fig, bbox_inches="tight")
     plt.close(fig)
     return report_path
-

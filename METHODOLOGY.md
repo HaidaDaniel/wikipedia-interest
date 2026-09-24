@@ -6,9 +6,11 @@ Wikimedia Pageviews counts requests for a Wikipedia article under the selected a
 
 ## Metrics
 
-The default monthly series is a sum of API observations in each calendar month. We report total, mean, median, first/last robust-window growth, 12-period year-over-year growth when available, volatility (MAD divided by median), completeness and an annualized log-linear trend.
+The default monthly series is a sum of API observations in each calendar month. We report total, mean, median, first/last robust-window growth, 12-period year-over-year growth when available, volatility (MAD divided by median), completeness and an annualized log-linear trend. The CLI excludes the current incomplete calendar month in monthly mode and the current incomplete day in daily mode; `data_through` records the cutoff.
 
-The main trend fits `log(1 + views)` against equally spaced periods. The slope is annualized (`exp(slope * periods_per_year) - 1`) so it is less dominated by one very large month than first-vs-last growth. A centered rolling mean is fitted as a smoothed companion. `growing` means trend >= +10% per year and a usable fit; `declining` means <= -10%; otherwise the series is `flat` when the fit is reasonably consistent and `uncertain` when noise or data quality prevents a directional claim.
+The main trend fits `log(1 + views)` against the actual positions of observed periods. The slope is annualized (`exp(slope * periods_per_year) - 1`) so it is less dominated by one very large month than first-vs-last growth. A centered rolling mean is fitted as a smoothed companion. `growing` means trend >= +10% per year and a usable fit; `declining` means <= -10%; otherwise the series is `flat` when the fit is reasonably consistent and `uncertain` when noise or data quality prevents a directional claim.
+
+Missing periods are not zero views. A real API item with `views: 0` has `observed: true`; a missing period is serialized as `views: null, observed: false`. Means, medians, regression, smoothing and anomaly detection use observed periods only. Completeness remains observed periods divided by expected periods, so missingness lowers evidence quality without manufacturing a decline.
 
 ## Why first and last points are insufficient
 
@@ -28,5 +30,4 @@ Reliability is not a statistical confidence interval. The score is an explainabl
 
 ## Cross-language comparisons
 
-Absolute views are shown as article attention, not comparable market size. Editions differ in population, Wikipedia usage, article coverage, naming, alternative pages and traffic mix. Comparisons prioritize relative growth dynamics, stability and evidence quality. A result can say “stronger signal for further validation”; it cannot establish product-market fit, conversion or willingness to pay.
-
+Absolute views are shown as article attention, not comparable market size. Editions differ in population, Wikipedia usage, article coverage, naming, alternative pages and traffic mix. Comparisons prioritize relative growth dynamics, stability and evidence quality. Balanced ranking gives a positive-growth bonus only to `growing` series; a large decline cannot win because of its absolute magnitude. If all series decline or are flat/uncertain, `no_positive_growth_signal` is true and `strongest_signal` is null. A result can say “stronger signal for further validation”; it cannot establish product-market fit, conversion or willingness to pay.

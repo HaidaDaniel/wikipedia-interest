@@ -53,6 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--cache-dir", default=".cache")
     analyze.add_argument("--no-cache", action="store_true")
     analyze.add_argument("--from-run", help="reuse request fields from a previous run")
+    analyze.add_argument("--verbose-json", action="store_true", help="include full observations in stdout; default is compact")
     report = sub.add_parser("report", help="create a one-page PDF from a saved run")
     report.add_argument("--run", required=True)
     inspect = sub.add_parser("inspect-run", help="print a compact summary of a saved run")
@@ -78,16 +79,40 @@ def _request_from_args(args: argparse.Namespace, prior: dict[str, Any] | None = 
     return AnalysisRequest(topic.strip(), languages, start, end, granularity, criterion)
 
 
+def _complete_data_through(today: date, granularity: str) -> date:
+    if granularity == "monthly":
+        return date(today.year, today.month, 1) - timedelta(days=1)
+    return today - timedelta(days=1)
+
+
+def compact_result(result: dict[str, Any]) -> dict[str, Any]:
+    compact = {key: value for key, value in result.items() if key != "series"}
+    compact["series"] = []
+    for series in result.get("series", []):
+        compact["series"].append({key: value for key, value in series.items() if key != "observations"})
+    return compact
+
+
 def _analyze(args: argparse.Namespace) -> dict[str, Any]:
     prior = load_run(args.from_run) if args.from_run else None
     request = _request_from_args(args, prior)
     actual_granularity = choose_granularity(request.start, request.end, request.granularity)
-    available_end = min(request.end, datetime.now(timezone.utc).date())
-    persisted_request = {**request.to_dict(), "effective_granularity": actual_granularity, "data_through": available_end.isoformat()}
+    complete_through = _complete_data_through(datetime.now(timezone.utc).date(), actual_granularity)
+    available_end = min(request.end, complete_through)
+    if request.start > available_end:
+        raise InterestError("NO_DATA", "requested range is after the latest complete Wikimedia period", {"data_through": complete_through.isoformat()})
+    partial_period_excluded = request.end > available_end
+    persisted_request = {
+        **request.to_dict(),
+        "effective_granularity": actual_granularity,
+        "requested_end": request.end.isoformat(),
+        "data_through": available_end.isoformat(),
+        "partial_period_excluded": partial_period_excluded,
+    }
     run_id, run_dir = make_run_dir(args.output, persisted_request)
     write_json(run_dir / "request.json", persisted_request)
     client = WikimediaClient(FileCache(args.cache_dir), use_cache=not args.no_cache)
-    raw_rows: list[dict[str, Any]] = []
+    pageview_rows: list[dict[str, Any]] = []
     series: list[dict[str, Any]] = []
     try:
         resolutions = resolve_topic(request.topic, request.languages, client)
@@ -97,15 +122,15 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
                 series.append({**common, "status": "error", "error_code": "ARTICLE_NOT_FOUND", "error": "No matching article found."})
                 continue
             try:
-                points = client.pageviews(resolution.project, resolution.title, datetime.combine(request.start, time.min), datetime.combine(available_end, time(23, 59)), actual_granularity) if request.start <= available_end else []
+                points = client.pageviews(resolution.project, resolution.title, datetime.combine(request.start, time.min), datetime.combine(available_end, time(23, 59)), actual_granularity)
             except WikimediaAPIError as exc:
                 series.append({**common, "status": "error", "error_code": exc.code, "error": exc.message})
                 continue
-            raw_rows.extend({"language": resolution.language, "article": resolution.title, **point.to_dict()} for point in points)
+            pageview_rows.extend({"language": resolution.language, "article": resolution.title, **point.to_dict()} for point in points)
             if not points:
                 series.append({**common, "status": "error", "error_code": "NO_DATA", "error": "Wikimedia returned no pageview observations."})
                 continue
-            analysis = analyze_series(points, request.start, request.end, actual_granularity, resolution.confidence)
+            analysis = analyze_series(points, request.start, available_end, actual_granularity, resolution.confidence)
             reliability = assess_reliability(analysis["metrics"], analysis["anomalies"], resolution.confidence)
             series.append({**common, "status": "ok", "metrics": analysis["metrics"], "reliability": reliability, "anomalies": analysis["anomalies"], "observations": analysis["observations"]})
     finally:
@@ -113,8 +138,9 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
     if not any(row.get("status") == "ok" for row in series):
         raise InterestError("NO_DATA", "no requested language produced usable pageview data", {"run_id": run_id})
     limitations = list(LIMITATIONS)
-    if request.end > available_end:
+    if partial_period_excluded:
         limitations.append(f"Requested end extends beyond available data; observations were fetched through {available_end.isoformat()}.")
+    succeeded = sum(row.get("status") == "ok" for row in series)
     result = {
         "status": "ok",
         "run_id": run_id,
@@ -122,20 +148,25 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
         "series": series,
         "comparison": compare_series(series, request.criterion),
         "limitations": limitations,
-        "artifacts": {"chart": str(run_dir / "chart.png"), "data": str(run_dir / "data.csv"), "raw": str(run_dir / "raw.json"), "report": None},
+        "partial": succeeded < len(request.languages),
+        "languages_requested": len(request.languages),
+        "languages_succeeded": succeeded,
+        "languages_failed": len(request.languages) - succeeded,
+        "artifacts": {"chart": str(run_dir / "chart.png"), "data": str(run_dir / "data.csv"), "pageviews": str(run_dir / "pageviews.json"), "report": None},
         "analysis_version": "0.1",
     }
-    write_json(run_dir / "raw.json", raw_rows)
-    # A flat CSV is convenient for human review and still excludes analysis internals.
+    # A flat JSON/CSV pair is convenient for human review. It is normalized
+    # pageview data, not an unmodified Wikimedia response.
+    write_json(run_dir / "pageviews.json", pageview_rows)
     import csv
     with (run_dir / "data.csv").open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["language", "article", "timestamp", "views"])
         writer.writeheader()
-        writer.writerows(raw_rows)
+        writer.writerows(pageview_rows)
     create_chart(result, run_dir / "chart.png")
     write_json(run_dir / "result.json", result)
-    write_json(run_dir / "metadata.json", {"run_id": run_id, "created_at": datetime.utcnow().isoformat() + "Z", "analysis_version": "0.1", "effective_granularity": actual_granularity, "cache_enabled": not args.no_cache})
-    return result
+    write_json(run_dir / "metadata.json", {"run_id": run_id, "created_at": datetime.now(timezone.utc).isoformat(), "analysis_version": "0.1", "effective_granularity": actual_granularity, "cache_enabled": not args.no_cache, "data_through": available_end.isoformat()})
+    return result if args.verbose_json else compact_result(result)
 
 
 def _handle(args: argparse.Namespace) -> dict[str, Any]:

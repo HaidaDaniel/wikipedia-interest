@@ -8,11 +8,11 @@
 - [x] daily/monthly aggregation and metrics
 - [x] anomaly detection
 - [x] evidence-quality assessment
-- [x] chart and one-page PDF
+- [x] chart and one-page PDF, including 4-language and partial-success paths
 - [x] stable JSON CLI and machine-readable errors
 - [x] unit tests with fixtures/mocks
-- [x] three documented example scenarios
+- [x] three documented example scenarios and one committed demo artifact
 - [x] Agent Skill instructions
 - [x] README and methodology
-- [x] end-to-end validation
-
+- [x] deterministic CLI end-to-end validation
+- [x] cheap external tool-capable model validation via OpenCode free model

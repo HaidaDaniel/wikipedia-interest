@@ -18,7 +18,7 @@ uv run wikipedia-interest analyze \
   --start 2024-09 --end 2026-09 --granularity monthly --output output
 ```
 
-The command prints one JSON object and saves `output/<run-id>/result.json`, `data.csv`, `raw.json`, and `chart.png`. The agent can summarize `comparison.strongest_signal`, explain each `series[].metrics.trend_label`, and quote `series[].reliability.reasons`.
+The command prints one compact JSON object and saves a full `output/<run-id>/result.json`, `data.csv`, normalized `pageviews.json`, and `chart.png`. The persisted result includes observations; stdout omits them by default for small models. The agent can summarize `comparison.strongest_signal`, explain each `series[].metrics.trend_label`, and quote `series[].reliability.reasons`.
 
 ## Architecture
 
@@ -33,6 +33,12 @@ JSON + chart + one-page PDF → agent explanation with caveats
 ```
 
 The LLM handles natural language and presentation. It does not write Python, calculate statistics, inspect a large CSV or select formulas.
+
+## Demo
+
+![Example chart](examples/artifacts/astronomy-uk/chart.png)
+
+[Open the committed one-page PDF report](examples/artifacts/astronomy-uk/report.pdf) · [compact example JSON](examples/artifacts/astronomy-uk/result.json)
 
 ## Why this works with a small agent model
 
@@ -51,15 +57,37 @@ uv run wikipedia-interest inspect-run output/<run-id>
 
 ## Commands
 
-`analyze` resolves each article, fetches daily/monthly observations, writes a reproducible run and chart, and prints stable JSON. Use `--criterion growth|stability|balanced`, `--no-cache`, or `--from-run` for a follow-up.
+`analyze` resolves each article, fetches daily/monthly observations, writes a reproducible run and chart, and prints stable compact JSON. Use `--criterion growth|stability|balanced`, `--no-cache`, `--from-run`, or `--verbose-json` when full observations are explicitly needed.
 
 `report` creates `report.pdf` from the saved run without another API call.
 
 `inspect-run` returns a compact context suitable for an agent follow-up.
 
+Failed language resolutions remain visible as `unresolved/excluded` while successful languages continue through chart, comparison and PDF generation. If all languages fail, the CLI returns a machine-readable `NO_DATA` error.
+
+## Install as an Agent Skill
+
+For OpenCode or another Agent Skills-compatible agent, use the repository as the project and expose the project-local skill directory:
+
+```bash
+git clone https://github.com/HaidaDaniel/wikiInteresestSkill.git wikipedia-interest
+cd wikipedia-interest
+uv sync
+# OpenCode discovers .agents/skills/wikipedia-interest/SKILL.md automatically.
+```
+
+For a separate host skill directory, use a symlink or copy while keeping the executable repository available as the working directory:
+
+```bash
+mkdir -p /path/to/agent-project/.agents/skills
+ln -s /absolute/path/to/wikiInteresestSkill /path/to/agent-project/.agents/skills/wikipedia-interest
+```
+
+The canonical skill name is `wikipedia-interest`; the existing GitHub repository name is not changed by this local package.
+
 ## Methodology and reliability
 
-For longer windows the default is monthly aggregation. The main trend is an annualized linear regression on `log1p(pageviews)`, paired with a rolling-smoothed trend and a 12-period YoY comparison when possible. A robust median/MAD detector marks spikes. Labels use fixed thresholds: ±10% annualized with fit/data checks. The source is the [Wikimedia Pageviews API](https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/reference/page-views.html).
+For longer windows the default is monthly aggregation. Only complete calendar periods are fetched: a requested current month is excluded and surfaced as `data_through` plus `partial_period_excluded`. Missing periods remain `views: null, observed: false`; genuine API zeroes remain `views: 0, observed: true` and are the only zeroes used in regression. The main trend is an annualized linear regression on observed `log1p(pageviews)`, paired with a rolling-smoothed trend and a 12-period YoY comparison when possible. A robust median/MAD detector marks spikes. Labels use fixed thresholds: ±10% annualized with fit/data checks. The source is the [Wikimedia Pageviews API](https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/reference/page-views.html).
 
 Reliability means evidence quality, not statistical confidence. A transparent 0–100 heuristic rewards duration, completeness, meaningful signal, fit consistency and confident article resolution, and penalizes noise and spikes. See [METHODOLOGY.md](METHODOLOGY.md).
 
@@ -78,7 +106,9 @@ Every follow-up is a new run; prior pageview data remains reusable through `.cac
 uv run pytest
 ```
 
-The test suite covers metric direction, seasonality-aware YoY, zeros and missing periods, anomalies, reliability, resolver edge cases, JSON shape and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
+The current suite has **24 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability, resolver edge cases, retry behavior, compact JSON, multi-series charts, partial-success PDF, JSON shape and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly. OpenCode 1.18.31 successfully validated the skill with `opencode/mimo-v2.6-flash-free`; the exact prompt and evidence are in [docs/cheap-model-validation.md](docs/cheap-model-validation.md).
+
+Official validation passes for the OpenCode-installable skill directory: `uvx --from skills-ref agentskills validate .agents/skills/wikipedia-interest`. Validating the GitHub repository root itself intentionally fails the directory-name check because the existing repository name is `wikiInteresestSkill`; use the nested canonical skill path when installing it.
 
 ## Limitations
 

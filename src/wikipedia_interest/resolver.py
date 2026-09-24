@@ -41,9 +41,10 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
             warnings.append(f"English search selected '{canonical}' for requested topic '{topic}'.")
 
     links = client.langlinks("en", canonical) if canonical else {}
-    # Interlanguage links are usually enough. Wikidata sitelinks repair sparse
-    # or truncated language-link responses without guessing a translated title.
-    if canonical and hasattr(client, "wikidata_id") and hasattr(client, "wikidata_sitelinks"):
+    # Interlanguage links are usually enough. Only use Wikidata when a
+    # requested edition is still missing, reducing calls and rate-limit risk.
+    missing_languages = [language for language in languages if language != "en" and language not in links]
+    if canonical and missing_languages and hasattr(client, "wikidata_id") and hasattr(client, "wikidata_sitelinks"):
         try:
             wikidata_id = client.wikidata_id("en", canonical)
             if wikidata_id:
@@ -71,11 +72,14 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
             else:
                 search_unavailable = False
             exact = next((row["title"] for row in results if _norm(row.get("title", "")) == _norm(topic)), None)
-            title = exact
+            top = results[0].get("title") if results else None
+            title = exact or top
             if title:
-                item_method = "target_language_exact_search"
-                item_confidence = "medium"
+                item_method = "target_language_exact_search" if exact else "target_language_search"
+                item_confidence = "medium" if exact else "low"
                 item_warnings = [f"No English interlanguage link for {language}; target-language search was used."]
+                if not exact:
+                    item_warnings.append(f"Search selected '{title}'; verify that it represents the requested concept.")
             else:
                 reason = "target-language search was unavailable" if search_unavailable else "no confident article match found"
                 item_method, item_confidence, item_warnings = "unresolved", "low", [f"{reason} for language '{language}'."]
