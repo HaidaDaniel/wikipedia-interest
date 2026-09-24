@@ -13,7 +13,7 @@ Use this skill for questions such as “is interest in astronomy growing in Ukra
 
 ## Fixed workflow
 
-1. Convert the request into `topic`, comma-separated `languages`, inclusive `start` and `end`, and optional `criterion` (`balanced`, `growth`, or `stability`). Use `monthly` for roughly annual or longer windows; `auto` chooses monthly above 180 days.
+1. Convert the request into `topic`, comma-separated `languages`, inclusive `start` and `end`, and optional `criterion` (`balanced`, `growth`, or `stability`). Use `monthly` for roughly annual or longer windows; `auto` chooses monthly above 180 days. For “last N months”, use the last N complete calendar months: set `start` to N calendar months before the current month and `end` to the current month, because the CLI excludes the current incomplete month. For example, on 2026-09-24, “last 24 months” means `--start 2024-09 --end 2026-09` and yields 2024-09 through 2026-08.
 2. Run:
 
    ```bash
@@ -23,6 +23,8 @@ Use this skill for questions such as “is interest in astronomy growing in Ukra
 3. Read the single compact JSON object on stdout. Full observations are persisted in `output/<run-id>/result.json`; use `--verbose-json` only when explicitly needed. Do not inspect `data.csv` to calculate metrics. Use `series[].resolution`, `series[].metrics`, `series[].anomalies`, `series[].reliability`, `comparison`, and `limitations`.
 4. Mention resolution warnings and evidence quality. Describe outputs as “interest signal” or “worth further validation”, never as confirmed market demand.
 5. For a human-shareable brief, run `uv run wikipedia-interest report --run output/<run-id>`. For a short follow-up context, run `uv run wikipedia-interest inspect-run output/<run-id>`.
+
+Do not promise an article override, exclusion rule, or other operation unless the CLI help shows a supported option. This CLI has no `--article`, `--title`, or article-override flag; use the resolver warnings and a new supported request instead.
 
 ## Output contract
 
@@ -40,6 +42,8 @@ Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to st
 `--from-run` reuses the prior request fields and the filesystem cache but always creates a new run directory. Cached retrieval is keyed by project, article, access, agent, granularity and date range.
 
 Monthly analysis excludes the current incomplete calendar month and returns `request.data_through` plus `request.partial_period_excluded`. Missing periods are `views: null, observed: false`; genuine zero observations remain `views: 0, observed: true`. If some languages fail, continue with successful series and mention `partial`, `languages_failed`, and resolution warnings. If all fail, report the machine-readable `NO_DATA` error.
+
+Low-confidence target-language search results are candidates, not verified concept matches. They remain visible for inspection, but the deterministic comparison excludes them until the article is verified; state the semantic-mismatch risk. A `growing` or `declining` label describes direction only, not stability or strong evidence. Use `trend_fit_r2`, reliability, volatility, data completeness, resolution confidence and baseline size before calling a signal consistent or robust; growth from a very low base with a modest fit is provisional.
 
 ## Interpretation guardrails
 
