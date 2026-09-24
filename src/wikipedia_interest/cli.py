@@ -122,16 +122,22 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
     try:
         resolutions = resolve_topic(request.topic, request.languages, client)
         for resolution in resolutions:
-            common = {"language": resolution.language, "project": resolution.project, "article": resolution.title, "resolution": resolution.to_dict()}
+            common = {
+                "language": resolution.language,
+                "project": resolution.project,
+                "article": resolution.title,
+                "pageview_article": resolution.pageview_title,
+                "resolution": resolution.to_dict(),
+            }
             if not resolution.title:
                 series.append({**common, "status": "error", "error_code": "ARTICLE_NOT_FOUND", "error": "No matching article found."})
                 continue
             try:
-                points = client.pageviews(resolution.project, resolution.title, datetime.combine(request.start, time.min), datetime.combine(available_end, time(23, 59)), actual_granularity)
+                points = client.pageviews(resolution.project, resolution.pageview_title or resolution.title, datetime.combine(request.start, time.min), datetime.combine(available_end, time(23, 59)), actual_granularity)
             except WikimediaAPIError as exc:
                 series.append({**common, "status": "error", "error_code": exc.code, "error": exc.message})
                 continue
-            pageview_rows.extend({"language": resolution.language, "article": resolution.title, **point.to_dict()} for point in points)
+            pageview_rows.extend({"language": resolution.language, "article": resolution.title, "pageview_article": resolution.pageview_title or resolution.title, **point.to_dict()} for point in points)
             if not points:
                 series.append({**common, "status": "error", "error_code": "NO_DATA", "error": "Wikimedia returned no pageview observations."})
                 continue
@@ -149,6 +155,8 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
     if comparison.get("excluded_low_confidence"):
         languages = ", ".join(item["language"] for item in comparison["excluded_low_confidence"])
         limitations.append(f"Low-confidence article candidates ({languages}) were retained for inspection but excluded from comparison. Refine the topic and rerun if a resolved title does not represent the intended concept.")
+    if any(row.get("resolution", {}).get("has_fragment") for row in series):
+        limitations.append("Section-level concept matches use Pageviews for the parent article; treat these as low-confidence proxies.")
     succeeded = sum(row.get("status") == "ok" for row in series)
     result = {
         "status": "ok",
@@ -169,7 +177,7 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
     write_json(run_dir / "pageviews.json", pageview_rows)
     import csv
     with (run_dir / "data.csv").open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["language", "article", "timestamp", "views"])
+        writer = csv.DictWriter(handle, fieldnames=["language", "article", "pageview_article", "timestamp", "views"])
         writer.writeheader()
         writer.writerows(pageview_rows)
     create_chart(result, run_dir / "chart.png")

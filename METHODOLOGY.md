@@ -28,6 +28,8 @@ An observation is a candidate spike when its robust z-score exceeds 3.5, using m
 
 Reliability is not a statistical confidence interval. The score is an explainable heuristic: 0–100 points from duration, completeness, trend signal, fit consistency, volatility and article-resolution quality, with penalties for anomalies. `high` (70–100), `medium` (45–69), and `low` (0–44) describe how much weight to give the directional signal in this dataset. Low-confidence article candidates are capped at `low` evidence quality and excluded from comparison rankings; refine the topic and rerun if a resolved title does not represent the intended concept. Medium-confidence resolutions are capped at `medium`.
 
+When a resolved target is a section (`Article#Section`), the concept target remains the section while Pageviews retrieval uses the parent article. Results preserve both `article` and `pageview_article` and mark `resolution.has_fragment`. Because the views cover the whole parent page rather than the section concept, these metrics are low-confidence proxies and are excluded from comparison.
+
 ## Multilingual rendering
 
 Charts and PDF reports check installed font coverage for their fixed labels and actual topic, article and language text. Unused scripts do not become required glyphs. If no single font covers the text, a small ordered fallback stack is selected by greedy glyph coverage, with DejaVu Sans last. No font files are bundled; a warning is emitted only when the installed stack cannot cover glyphs present in the artifact text.

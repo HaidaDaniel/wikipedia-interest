@@ -62,3 +62,38 @@ def test_disambiguation_pageprops_are_detected(tmp_path):
         assert client.is_disambiguation("en", "Claude") is True
     finally:
         client.close()
+
+
+def test_pageviews_request_uses_parent_page_for_section_title(tmp_path):
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json={"items": [{"timestamp": "2024010100", "views": 3}]})
+
+    client = WikimediaClient(FileCache(tmp_path), http_client=httpx.Client(transport=httpx.MockTransport(handler)), use_cache=False)
+    try:
+        points = client.pageviews("de.wikipedia.org", "Netbook#Nettop", datetime(2024, 1, 1), datetime(2024, 1, 31), "monthly")
+    finally:
+        client.close()
+
+    assert len(points) == 1
+    assert "/Netbook/monthly/" in requests[0].url.path
+    assert "%23Nettop" not in str(requests[0].url)
+
+
+def test_pageprops_normalize_fragment_titles_to_parent_page(tmp_path):
+    titles = []
+
+    def handler(request):
+        titles.append(request.url.params["titles"])
+        return httpx.Response(200, json={"query": {"pages": {"1": {"pageprops": {"wikibase_item": "Q1"}}}}})
+
+    client = WikimediaClient(FileCache(tmp_path), http_client=httpx.Client(transport=httpx.MockTransport(handler)), use_cache=False)
+    try:
+        assert client.wikidata_id("de", "Netbook#Nettop") == "Q1"
+        assert client.is_disambiguation("de", "Netbook#Nettop") is False
+    finally:
+        client.close()
+
+    assert titles == ["Netbook", "Netbook"]

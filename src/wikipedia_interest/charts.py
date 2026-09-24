@@ -17,6 +17,20 @@ def _successful_series(result: dict[str, Any]) -> list[dict[str, Any]]:
     return [series for series in result.get("series", []) if series.get("status") == "ok" and series.get("observations")]
 
 
+def _series_title(series: dict[str, Any]) -> str:
+    metrics = series.get("metrics", {})
+    resolution = series.get("resolution", {})
+    if resolution.get("has_fragment"):
+        article = str(series.get("article") or "")
+        source = series.get("pageview_article") or resolution.get("pageview_title") or article.split("#", 1)[0]
+        qualifier = f" · low-confidence section proxy; pageviews measured on parent page: {source}"
+    elif resolution.get("confidence") == "low":
+        qualifier = " · low-confidence candidate, excluded from comparison"
+    else:
+        qualifier = ""
+    return f"{series['language']} — {series.get('article', '')} · {metrics.get('trend_label', 'uncertain')}{qualifier}"
+
+
 def create_chart(result: dict[str, Any], path: str | Path) -> Path:
     renderable = _successful_series(result)
     if not renderable:
@@ -45,9 +59,7 @@ def create_chart(result: dict[str, Any], path: str | Path) -> Path:
             ax.plot(dates, smooth, color="#f97316", linewidth=1.6, linestyle="--", label="3-period smooth")
         for anomaly in series.get("anomalies", []):
             ax.axvline(pd.to_datetime(anomaly["date"]), color="#dc2626", alpha=0.18, linewidth=1)
-        metrics = series.get("metrics", {})
-        candidate = " · low-confidence candidate, excluded from comparison" if series.get("resolution", {}).get("confidence") == "low" else ""
-        ax.set_title(f"{series['language']} — {series.get('article', '')} · {metrics.get('trend_label', 'uncertain')}{candidate}", loc="left", fontsize=10, fontweight="normal")
+        ax.set_title(_series_title(series), loc="left", fontsize=10, fontweight="normal")
         ax.set_ylabel("pageviews")
         ax.grid(axis="y", alpha=0.2)
         ax.legend(frameon=False, fontsize=8, loc="upper left")

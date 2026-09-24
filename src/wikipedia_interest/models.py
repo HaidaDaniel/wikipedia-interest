@@ -30,6 +30,8 @@ class ResolvedArticle:
     method: str
     confidence: str
     warnings: list[str] = field(default_factory=list)
+    pageview_title: str | None = None
+    has_fragment: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -67,4 +69,3 @@ class RunResult:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
-

@@ -51,3 +51,24 @@ def test_all_low_confidence_is_not_reported_as_a_valid_no_growth_comparison():
     assert result["excluded_series_count"] == 2
     assert result["no_eligible_series"] is True
     assert result["no_positive_growth_signal"] is None
+
+
+def test_section_proxy_series_keeps_metrics_but_is_excluded():
+    section = {
+        "status": "ok",
+        "language": "de",
+        "article": "Netbook#Nettop",
+        "pageview_article": "Netbook",
+        "resolution": {"confidence": "low", "has_fragment": True},
+        "metrics": {"trend_label": "growing", "trend_pct_per_year": 20},
+        "reliability": {"level": "low", "score": 35},
+    }
+
+    result = compare_series([section])
+
+    assert section["status"] == "ok"
+    assert section["metrics"]
+    assert result["ranking"] == []
+    assert result["excluded_low_confidence"][0]["language"] == "de"
+    assert result["eligible_series_count"] == 0
+    assert result["no_eligible_series"] is True

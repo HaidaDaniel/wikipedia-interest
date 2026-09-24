@@ -93,3 +93,25 @@ def test_disambiguation_pages_are_low_confidence_candidates():
     result = resolve_topic("Claude", ["en", "fr"], DisambiguationClient())
     assert [item.confidence for item in result] == ["low", "low"]
     assert all(any("disambiguation page" in warning for warning in item.warnings) for item in result)
+
+
+class SectionLinkClient(FakeClient):
+    def search(self, language, query, limit=5):
+        return [{"title": "Mini PC"}] if language == "en" else []
+
+    def langlinks(self, language, title):
+        return {"de": "Netbook#Nettop"}
+
+    def is_disambiguation(self, language, title):
+        return False
+
+
+def test_section_interlanguage_match_becomes_low_confidence_proxy():
+    resolved = resolve_topic("mini PC", ["de"], SectionLinkClient())[0]
+
+    assert resolved.title == "Netbook#Nettop"
+    assert resolved.pageview_title == "Netbook"
+    assert resolved.has_fragment is True
+    assert resolved.confidence == "low"
+    assert resolved.url == "https://de.wikipedia.org/wiki/Netbook#Nettop"
+    assert any("section" in warning and "parent page" in warning for warning in resolved.warnings)

@@ -9,6 +9,7 @@ import httpx
 
 from .cache import FileCache
 from .models import InterestError, PageviewPoint
+from .titles import split_title_fragment
 
 
 class WikimediaAPIError(InterestError):
@@ -87,6 +88,7 @@ class WikimediaClient:
         return self.cache.get_or_set("resolution", key, fetch, self.use_cache)
 
     def wikidata_id(self, language: str, title: str) -> str | None:
+        title, _ = split_title_fragment(title)
         key = f"wikidata-id|{language}|{title}"
 
         def fetch() -> str | None:
@@ -97,6 +99,7 @@ class WikimediaClient:
         return self.cache.get_or_set("resolution", key, fetch, self.use_cache)
 
     def is_disambiguation(self, language: str, title: str) -> bool:
+        title, _ = split_title_fragment(title)
         key = f"disambiguation|{language}|{title}"
 
         def fetch() -> bool:
@@ -119,6 +122,7 @@ class WikimediaClient:
     def pageviews(self, project: str, article: str, start: datetime, end: datetime, granularity: str) -> list[PageviewPoint]:
         if granularity not in {"daily", "monthly"}:
             raise InterestError("INVALID_GRANULARITY", "granularity must be daily or monthly")
+        article, _ = split_title_fragment(article)
         # Per-article pageviews uses YYYYMMDD boundaries and puts granularity
         # in the route (not in a query parameter).
         start_text = start.strftime("%Y%m%d")

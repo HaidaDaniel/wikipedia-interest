@@ -118,7 +118,7 @@ Every follow-up is a new run; prior pageview data remains reusable through `.cac
 uv run pytest
 ```
 
-The current suite has **41 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability caps, resolver edge cases, retry behavior, compact JSON, font selection and fallback behavior, all-low-confidence comparison eligibility, argparse JSON errors, multilingual rendering, multi-series charts, report wording and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
+The current suite has **51 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability caps, resolver edge cases, section-fragment resolution and URL handling, retry behavior, compact JSON, font selection and fallback behavior, all-low-confidence comparison eligibility, argparse JSON errors, multilingual rendering, multi-series charts, report wording and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
 
 Validation evidence is split into [free-model-opencode.md](docs/validation/free-model-opencode.md) and [local-qwen-opencode.md](docs/validation/local-qwen-opencode.md). Post-fix cases are summarized in [post-fix-evaluation.md](docs/post-fix-evaluation.md). Both OpenCode runs passed; the Claude Haiku attempt was not validation because its provider reported insufficient funds. The Agent Skills validator passes when run against a checkout whose directory is named `wikipedia-interest`:
 

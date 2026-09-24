@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from wikipedia_interest.analysis import compare_series
-from wikipedia_interest.charts import create_chart
+from wikipedia_interest.charts import _series_title, create_chart
 import wikipedia_interest.report as report_module
 from wikipedia_interest.report import create_report
 
@@ -96,3 +96,23 @@ def test_report_uses_no_growth_wording_for_eligible_declining_series(tmp_path, m
 
     text = "\n".join(captured)
     assert "No clear positive growth signal was found in this comparison." in text
+
+
+def test_section_proxy_chart_and_report_name_parent_page(tmp_path, monkeypatch):
+    captured = _capture_pdf_text(monkeypatch)
+    section = series("de")
+    section.update({
+        "article": "Netbook#Nettop",
+        "pageview_article": "Netbook",
+        "resolution": {"confidence": "low", "has_fragment": True, "pageview_title": "Netbook"},
+    })
+    payload = result([section])
+    payload["comparison"] = compare_series([section])
+
+    assert "low-confidence section proxy" in _series_title(section)
+    assert "pageviews measured on parent page: Netbook" in _series_title(section)
+    create_report(payload, tmp_path)
+
+    report_text = "\n".join(captured)
+    assert "section proxy" in report_text
+    assert "Pageviews cover parent page Netbook" in report_text

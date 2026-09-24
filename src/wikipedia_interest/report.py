@@ -19,8 +19,12 @@ def _finding(series: dict[str, Any]) -> str:
     growth = metrics.get("trend_pct_per_year")
     growth_text = "trend unavailable" if growth is None else f"{growth:+.1f}% annualized trend"
     reliability = series.get("reliability", {})
-    confidence = series.get("resolution", {}).get("confidence")
+    resolution = series.get("resolution", {})
+    confidence = resolution.get("confidence")
     resolution_text = "; low-confidence candidate — excluded from comparison" if confidence == "low" else ""
+    if resolution.get("has_fragment"):
+        source = series.get("pageview_article") or resolution.get("pageview_title", "parent page")
+        resolution_text += f"; section proxy — Pageviews cover parent page {source}"
     return f"{series.get('language', '?')}: {metrics.get('trend_label', 'uncertain')}; {growth_text}; evidence {reliability.get('level', 'unknown')} ({reliability.get('score', 'n/a')}/100){resolution_text}."
 
 

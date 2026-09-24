@@ -49,6 +49,8 @@ Monthly analysis excludes the current incomplete calendar month and returns `req
 
 Low-confidence article matches remain visible for inspection but are excluded from comparison. Refine the topic and rerun if a resolved title does not represent the intended concept; the CLI has no article verification or override state. If no series is eligible, `comparison.no_positive_growth_signal` is `null`. If eligible series exist but none shows positive growth, it is `true`. A `growing` or `declining` label describes direction only, not stability or strong evidence. Use `trend_fit_r2`, reliability, volatility, data completeness, resolution confidence and baseline size before calling a signal consistent or robust; growth from a very low base with a modest fit is provisional.
 
+If a resolved title includes a section fragment such as `Article#Section`, keep that concept target visible but retrieve Pageviews for the parent article. The result records both `article` and `pageview_article`; section-derived metrics are low-confidence whole-page proxies and are excluded from comparison.
+
 ## Interpretation guardrails
 
 Always distinguish absolute article attention, growth dynamics and evidence quality. Cross-language totals are not market size because editions differ in audience, coverage, naming and traffic mix. A spike, unresolved/low-confidence article, incomplete periods or `uncertain` trend must be stated. Recommend external validation such as interviews, search demand, product analytics or conversion research before product decisions.

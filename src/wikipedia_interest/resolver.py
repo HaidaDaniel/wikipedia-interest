@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import re
-from urllib.parse import quote
 
 from .models import InterestError, ResolvedArticle
+from .titles import split_title_fragment, wikipedia_article_url
 from .wikipedia import WikimediaClient
 
 
@@ -95,6 +95,14 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
             else:
                 reason = "target-language search was unavailable" if search_unavailable else "no confident article match found"
                 item_method, item_confidence, item_warnings = "unresolved", "low", [f"{reason} for language '{language}'."]
+        pageview_title, fragment = split_title_fragment(title) if title else (None, None)
+        has_fragment = fragment is not None
+        if has_fragment:
+            item_confidence = "low"
+            item_warnings.append(
+                f"Resolved concept maps to a section of the broader '{pageview_title}' article. "
+                "Pageviews cover the parent page, so this is a low-confidence proxy and is excluded from comparison."
+            )
         if title and hasattr(client, "is_disambiguation"):
             try:
                 if client.is_disambiguation(language, title):
@@ -102,5 +110,15 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
                     item_warnings.append("Resolved title is a Wikipedia disambiguation page; treat it as a low-confidence candidate and review its concept match.")
             except InterestError:
                 item_warnings.append("Disambiguation status could not be checked; review the article match before using its metrics.")
-        resolved.append(ResolvedArticle(language, f"{language}.wikipedia.org", title, f"https://{language}.wikipedia.org/wiki/{quote(title.replace(' ', '_'), safe='') }" if title else None, item_method, item_confidence, item_warnings))
+        resolved.append(ResolvedArticle(
+            language,
+            f"{language}.wikipedia.org",
+            title,
+            wikipedia_article_url(language, title) if title else None,
+            item_method,
+            item_confidence,
+            item_warnings,
+            pageview_title,
+            has_fragment,
+        ))
     return resolved
