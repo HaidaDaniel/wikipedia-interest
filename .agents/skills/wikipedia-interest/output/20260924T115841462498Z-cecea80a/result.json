@@ -1,0 +1,793 @@
+{
+  "status": "ok",
+  "run_id": "20260924T115841462498Z-cecea80a",
+  "request": {
+    "topic": "homelab",
+    "languages": [
+      "en",
+      "de",
+      "pl"
+    ],
+    "start": "2021-09-01",
+    "end": "2026-09-30",
+    "granularity": "monthly",
+    "criterion": "balanced",
+    "effective_granularity": "monthly",
+    "requested_end": "2026-09-30",
+    "data_through": "2026-08-31",
+    "partial_period_excluded": true
+  },
+  "series": [
+    {
+      "language": "en",
+      "project": "en.wikipedia.org",
+      "article": "Ambient intelligence",
+      "resolution": {
+        "language": "en",
+        "project": "en.wikipedia.org",
+        "title": "Ambient intelligence",
+        "url": "https://en.wikipedia.org/wiki/Ambient_intelligence",
+        "method": "english_search_plus_interlanguage",
+        "confidence": "low",
+        "warnings": [
+          "English search selected 'Ambient intelligence' for requested topic 'homelab'.",
+          "English search result has weak lexical overlap; treat the resolution as a low-confidence candidate."
+        ]
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 60,
+        "observed_periods": 60,
+        "data_completeness_pct": 100.0,
+        "total_views": 80446,
+        "mean_period_views": 1340.77,
+        "median_period_views": 1317.5,
+        "first_window_vs_last_window_growth_pct": -63.56,
+        "recent_yoy_growth_pct": -17.21,
+        "trend_pct_per_year": -17.51,
+        "smoothed_trend_pct_per_year": -17.56,
+        "trend_fit_r2": 0.864,
+        "trend_label": "declining",
+        "volatility_mad_over_median": 0.2588,
+        "peak_views": 2303,
+        "peak_date": "2021-10-01",
+        "largest_peak_share_pct": 2.86
+      },
+      "reliability": {
+        "level": "low",
+        "score": 44,
+        "reasons": [
+          "60 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
+          "log-linear trend fit is consistent",
+          "period-to-period variation is moderate",
+          "no robust spike detected",
+          "article resolution is low confidence",
+          "low-confidence candidate is capped at low evidence quality and excluded from comparison"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [],
+      "observations": [
+        {
+          "date": "2021-09-01",
+          "views": 1934,
+          "observed": true
+        },
+        {
+          "date": "2021-10-01",
+          "views": 2303,
+          "observed": true
+        },
+        {
+          "date": "2021-11-01",
+          "views": 2206,
+          "observed": true
+        },
+        {
+          "date": "2021-12-01",
+          "views": 1978,
+          "observed": true
+        },
+        {
+          "date": "2022-01-01",
+          "views": 1839,
+          "observed": true
+        },
+        {
+          "date": "2022-02-01",
+          "views": 1860,
+          "observed": true
+        },
+        {
+          "date": "2022-03-01",
+          "views": 1694,
+          "observed": true
+        },
+        {
+          "date": "2022-04-01",
+          "views": 1772,
+          "observed": true
+        },
+        {
+          "date": "2022-05-01",
+          "views": 1812,
+          "observed": true
+        },
+        {
+          "date": "2022-06-01",
+          "views": 1771,
+          "observed": true
+        },
+        {
+          "date": "2022-07-01",
+          "views": 1470,
+          "observed": true
+        },
+        {
+          "date": "2022-08-01",
+          "views": 1379,
+          "observed": true
+        },
+        {
+          "date": "2022-09-01",
+          "views": 1923,
+          "observed": true
+        },
+        {
+          "date": "2022-10-01",
+          "views": 2029,
+          "observed": true
+        },
+        {
+          "date": "2022-11-01",
+          "views": 1878,
+          "observed": true
+        },
+        {
+          "date": "2022-12-01",
+          "views": 1690,
+          "observed": true
+        },
+        {
+          "date": "2023-01-01",
+          "views": 1732,
+          "observed": true
+        },
+        {
+          "date": "2023-02-01",
+          "views": 1462,
+          "observed": true
+        },
+        {
+          "date": "2023-03-01",
+          "views": 1485,
+          "observed": true
+        },
+        {
+          "date": "2023-04-01",
+          "views": 1408,
+          "observed": true
+        },
+        {
+          "date": "2023-05-01",
+          "views": 1378,
+          "observed": true
+        },
+        {
+          "date": "2023-06-01",
+          "views": 1342,
+          "observed": true
+        },
+        {
+          "date": "2023-07-01",
+          "views": 2180,
+          "observed": true
+        },
+        {
+          "date": "2023-08-01",
+          "views": 1526,
+          "observed": true
+        },
+        {
+          "date": "2023-09-01",
+          "views": 1326,
+          "observed": true
+        },
+        {
+          "date": "2023-10-01",
+          "views": 1309,
+          "observed": true
+        },
+        {
+          "date": "2023-11-01",
+          "views": 1347,
+          "observed": true
+        },
+        {
+          "date": "2023-12-01",
+          "views": 1163,
+          "observed": true
+        },
+        {
+          "date": "2024-01-01",
+          "views": 1364,
+          "observed": true
+        },
+        {
+          "date": "2024-02-01",
+          "views": 1304,
+          "observed": true
+        },
+        {
+          "date": "2024-03-01",
+          "views": 1479,
+          "observed": true
+        },
+        {
+          "date": "2024-04-01",
+          "views": 1328,
+          "observed": true
+        },
+        {
+          "date": "2024-05-01",
+          "views": 1368,
+          "observed": true
+        },
+        {
+          "date": "2024-06-01",
+          "views": 1007,
+          "observed": true
+        },
+        {
+          "date": "2024-07-01",
+          "views": 1048,
+          "observed": true
+        },
+        {
+          "date": "2024-08-01",
+          "views": 962,
+          "observed": true
+        },
+        {
+          "date": "2024-09-01",
+          "views": 1140,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 1236,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 1201,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 1128,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 1252,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 986,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 1049,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 920,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 966,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 1013,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 927,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 978,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 809,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 843,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 903,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 945,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 985,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 944,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 1005,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 837,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 975,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 808,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 808,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 732,
+          "observed": true
+        }
+      ]
+    },
+    {
+      "language": "de",
+      "project": "de.wikipedia.org",
+      "article": "Ambient Intelligence",
+      "resolution": {
+        "language": "de",
+        "project": "de.wikipedia.org",
+        "title": "Ambient Intelligence",
+        "url": "https://de.wikipedia.org/wiki/Ambient_Intelligence",
+        "method": "interlanguage_link",
+        "confidence": "low",
+        "warnings": [
+          "English search selected 'Ambient intelligence' for requested topic 'homelab'.",
+          "English search result has weak lexical overlap; treat the resolution as a low-confidence candidate."
+        ]
+      },
+      "status": "ok",
+      "metrics": {
+        "periods": 60,
+        "observed_periods": 60,
+        "data_completeness_pct": 100.0,
+        "total_views": 5435,
+        "mean_period_views": 90.58,
+        "median_period_views": 87.5,
+        "first_window_vs_last_window_growth_pct": -70.55,
+        "recent_yoy_growth_pct": -43.57,
+        "trend_pct_per_year": -21.65,
+        "smoothed_trend_pct_per_year": -21.76,
+        "trend_fit_r2": 0.723,
+        "trend_label": "declining",
+        "volatility_mad_over_median": 0.2343,
+        "peak_views": 187,
+        "peak_date": "2021-10-01",
+        "largest_peak_share_pct": 3.44
+      },
+      "reliability": {
+        "level": "low",
+        "score": 44,
+        "reasons": [
+          "60 periods provide a long comparison window",
+          "at least 95% of expected periods are present",
+          "directional trend is materially larger than the baseline threshold",
+          "log-linear trend fit is consistent",
+          "period-to-period variation is moderate",
+          "no robust spike detected",
+          "article resolution is low confidence",
+          "low-confidence candidate is capped at low evidence quality and excluded from comparison"
+        ],
+        "note": "Heuristic evidence quality, not a statistical confidence interval."
+      },
+      "anomalies": [],
+      "observations": [
+        {
+          "date": "2021-09-01",
+          "views": 142,
+          "observed": true
+        },
+        {
+          "date": "2021-10-01",
+          "views": 187,
+          "observed": true
+        },
+        {
+          "date": "2021-11-01",
+          "views": 177,
+          "observed": true
+        },
+        {
+          "date": "2021-12-01",
+          "views": 114,
+          "observed": true
+        },
+        {
+          "date": "2022-01-01",
+          "views": 169,
+          "observed": true
+        },
+        {
+          "date": "2022-02-01",
+          "views": 124,
+          "observed": true
+        },
+        {
+          "date": "2022-03-01",
+          "views": 150,
+          "observed": true
+        },
+        {
+          "date": "2022-04-01",
+          "views": 127,
+          "observed": true
+        },
+        {
+          "date": "2022-05-01",
+          "views": 150,
+          "observed": true
+        },
+        {
+          "date": "2022-06-01",
+          "views": 106,
+          "observed": true
+        },
+        {
+          "date": "2022-07-01",
+          "views": 103,
+          "observed": true
+        },
+        {
+          "date": "2022-08-01",
+          "views": 106,
+          "observed": true
+        },
+        {
+          "date": "2022-09-01",
+          "views": 104,
+          "observed": true
+        },
+        {
+          "date": "2022-10-01",
+          "views": 175,
+          "observed": true
+        },
+        {
+          "date": "2022-11-01",
+          "views": 126,
+          "observed": true
+        },
+        {
+          "date": "2022-12-01",
+          "views": 93,
+          "observed": true
+        },
+        {
+          "date": "2023-01-01",
+          "views": 101,
+          "observed": true
+        },
+        {
+          "date": "2023-02-01",
+          "views": 96,
+          "observed": true
+        },
+        {
+          "date": "2023-03-01",
+          "views": 103,
+          "observed": true
+        },
+        {
+          "date": "2023-04-01",
+          "views": 83,
+          "observed": true
+        },
+        {
+          "date": "2023-05-01",
+          "views": 79,
+          "observed": true
+        },
+        {
+          "date": "2023-06-01",
+          "views": 79,
+          "observed": true
+        },
+        {
+          "date": "2023-07-01",
+          "views": 68,
+          "observed": true
+        },
+        {
+          "date": "2023-08-01",
+          "views": 67,
+          "observed": true
+        },
+        {
+          "date": "2023-09-01",
+          "views": 89,
+          "observed": true
+        },
+        {
+          "date": "2023-10-01",
+          "views": 87,
+          "observed": true
+        },
+        {
+          "date": "2023-11-01",
+          "views": 114,
+          "observed": true
+        },
+        {
+          "date": "2023-12-01",
+          "views": 95,
+          "observed": true
+        },
+        {
+          "date": "2024-01-01",
+          "views": 81,
+          "observed": true
+        },
+        {
+          "date": "2024-02-01",
+          "views": 112,
+          "observed": true
+        },
+        {
+          "date": "2024-03-01",
+          "views": 89,
+          "observed": true
+        },
+        {
+          "date": "2024-04-01",
+          "views": 100,
+          "observed": true
+        },
+        {
+          "date": "2024-05-01",
+          "views": 88,
+          "observed": true
+        },
+        {
+          "date": "2024-06-01",
+          "views": 88,
+          "observed": true
+        },
+        {
+          "date": "2024-07-01",
+          "views": 78,
+          "observed": true
+        },
+        {
+          "date": "2024-08-01",
+          "views": 77,
+          "observed": true
+        },
+        {
+          "date": "2024-09-01",
+          "views": 80,
+          "observed": true
+        },
+        {
+          "date": "2024-10-01",
+          "views": 86,
+          "observed": true
+        },
+        {
+          "date": "2024-11-01",
+          "views": 86,
+          "observed": true
+        },
+        {
+          "date": "2024-12-01",
+          "views": 77,
+          "observed": true
+        },
+        {
+          "date": "2025-01-01",
+          "views": 100,
+          "observed": true
+        },
+        {
+          "date": "2025-02-01",
+          "views": 119,
+          "observed": true
+        },
+        {
+          "date": "2025-03-01",
+          "views": 108,
+          "observed": true
+        },
+        {
+          "date": "2025-04-01",
+          "views": 74,
+          "observed": true
+        },
+        {
+          "date": "2025-05-01",
+          "views": 65,
+          "observed": true
+        },
+        {
+          "date": "2025-06-01",
+          "views": 49,
+          "observed": true
+        },
+        {
+          "date": "2025-07-01",
+          "views": 51,
+          "observed": true
+        },
+        {
+          "date": "2025-08-01",
+          "views": 69,
+          "observed": true
+        },
+        {
+          "date": "2025-09-01",
+          "views": 44,
+          "observed": true
+        },
+        {
+          "date": "2025-10-01",
+          "views": 62,
+          "observed": true
+        },
+        {
+          "date": "2025-11-01",
+          "views": 50,
+          "observed": true
+        },
+        {
+          "date": "2025-12-01",
+          "views": 32,
+          "observed": true
+        },
+        {
+          "date": "2026-01-01",
+          "views": 36,
+          "observed": true
+        },
+        {
+          "date": "2026-02-01",
+          "views": 47,
+          "observed": true
+        },
+        {
+          "date": "2026-03-01",
+          "views": 41,
+          "observed": true
+        },
+        {
+          "date": "2026-04-01",
+          "views": 43,
+          "observed": true
+        },
+        {
+          "date": "2026-05-01",
+          "views": 40,
+          "observed": true
+        },
+        {
+          "date": "2026-06-01",
+          "views": 57,
+          "observed": true
+        },
+        {
+          "date": "2026-07-01",
+          "views": 37,
+          "observed": true
+        },
+        {
+          "date": "2026-08-01",
+          "views": 55,
+          "observed": true
+        }
+      ]
+    },
+    {
+      "language": "pl",
+      "project": "pl.wikipedia.org",
+      "article": null,
+      "resolution": {
+        "language": "pl",
+        "project": "pl.wikipedia.org",
+        "title": null,
+        "url": null,
+        "method": "unresolved",
+        "confidence": "low",
+        "warnings": [
+          "no confident article match found for language 'pl'."
+        ]
+      },
+      "status": "error",
+      "error_code": "ARTICLE_NOT_FOUND",
+      "error": "No matching article found."
+    }
+  ],
+  "comparison": {
+    "criterion": "balanced",
+    "ranking": [],
+    "strongest_signal": null,
+    "strongest_positive_signal": null,
+    "fastest_growth": null,
+    "most_reliable": null,
+    "eligible_series_count": 0,
+    "excluded_series_count": 2,
+    "no_eligible_series": true,
+    "no_positive_growth_signal": null,
+    "excluded_low_confidence": [
+      {
+        "language": "en",
+        "article": "Ambient intelligence",
+        "reason": "low-confidence article resolution; candidate excluded from comparison"
+      },
+      {
+        "language": "de",
+        "article": "Ambient Intelligence",
+        "reason": "low-confidence article resolution; candidate excluded from comparison"
+      }
+    ],
+    "rationale": "balanced positive growth signal and evidence quality",
+    "interpretation": "Absolute views indicate article attention, not comparable language-market size."
+  },
+  "limitations": [
+    "Pageviews measure attention, not people, willingness to pay, conversion or product-market fit.",
+    "Absolute views across language editions are not directly comparable as market size.",
+    "A single Wikipedia article may not represent the complete concept; review resolution warnings.",
+    "Requested end extends beyond available data; observations were fetched through 2026-08-31.",
+    "Low-confidence article candidates (en, de) were retained for inspection but excluded from comparison. Refine the topic and rerun if a resolved title does not represent the intended concept."
+  ],
+  "partial": true,
+  "languages_requested": 3,
+  "languages_succeeded": 2,
+  "languages_failed": 1,
+  "artifacts": {
+    "chart": "output/20260924T115841462498Z-cecea80a/chart.png",
+    "data": "output/20260924T115841462498Z-cecea80a/data.csv",
+    "pageviews": "output/20260924T115841462498Z-cecea80a/pageviews.json",
+    "report": null
+  },
+  "analysis_version": "0.1"
+}

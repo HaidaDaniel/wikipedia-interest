@@ -1,0 +1,16 @@
+{
+  "topic": "homelab",
+  "languages": [
+    "en",
+    "de",
+    "pl"
+  ],
+  "start": "2021-09-01",
+  "end": "2026-09-30",
+  "granularity": "monthly",
+  "criterion": "balanced",
+  "effective_granularity": "monthly",
+  "requested_end": "2026-09-30",
+  "data_through": "2026-08-31",
+  "partial_period_excluded": true
+}
