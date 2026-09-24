@@ -60,3 +60,17 @@ def test_target_search_top_match_is_explicitly_low_confidence():
     assert result[0].method == "target_language_search"
     assert result[0].confidence == "low"
     assert result[0].warnings
+
+
+class WeakEnglishMatchClient(FakeClient):
+    def search(self, language, query, limit=5):
+        if language == "en":
+            return [{"title": "Self-hosting (compilers)"}]
+        return []
+
+
+def test_weak_english_top_match_is_low_confidence():
+    result = resolve_topic("self-hosted AI", ["en"], WeakEnglishMatchClient())
+    assert result[0].title == "Self-hosting (compilers)"
+    assert result[0].confidence == "low"
+    assert any("weak lexical overlap" in warning for warning in result[0].warnings)

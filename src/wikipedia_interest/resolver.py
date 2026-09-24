@@ -8,10 +8,19 @@ from .wikipedia import WikimediaClient
 
 
 LANGUAGE_RE = re.compile(r"^[a-z]{2,3}(?:-[a-z0-9]+)?$")
+TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
 
 
 def _norm(value: str) -> str:
     return " ".join(value.casefold().replace("_", " ").split())
+
+
+def _lexical_overlap(topic: str, title: str) -> float:
+    topic_tokens = set(TOKEN_RE.findall(_norm(topic)))
+    title_tokens = set(TOKEN_RE.findall(_norm(title)))
+    if not topic_tokens:
+        return 0.0
+    return len(topic_tokens & title_tokens) / len(topic_tokens)
 
 
 def validate_languages(languages: list[str]) -> list[str]:
@@ -37,8 +46,11 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
         if exact:
             method, confidence = "english_exact_plus_interlanguage", "high"
         else:
-            method, confidence = "english_search_plus_interlanguage", "medium"
+            method = "english_search_plus_interlanguage"
+            confidence = "medium" if _lexical_overlap(topic, canonical or "") >= 0.5 else "low"
             warnings.append(f"English search selected '{canonical}' for requested topic '{topic}'.")
+            if confidence == "low":
+                warnings.append("English search result has weak lexical overlap; treat the resolution as a low-confidence candidate.")
 
     links = client.langlinks("en", canonical) if canonical else {}
     # Interlanguage links are usually enough. Only use Wikidata when a

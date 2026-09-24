@@ -42,7 +42,7 @@ Cache entries live in `.cache/` and are keyed by endpoint inputs, project, artic
 
 ## Resolution
 
-The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. Wikidata is queried only when requested languages are missing from langlinks. It falls back to a target-language search only when necessary. Exact/linked matches are high/medium confidence, a top search match is low confidence with an explicit warning, and unresolved languages are explicit errors rather than silent substitutions.
+The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. Wikidata is queried only when requested languages are missing from langlinks. It falls back to a target-language search only when necessary. Exact/linked matches are high/medium confidence; non-exact English matches with weak lexical overlap are low-confidence candidates with an explicit warning. Top target-language search matches are also low-confidence candidates, and low-confidence candidates are excluded from comparison rankings. Unresolved languages are explicit errors rather than silent substitutions.
 
 ## Statistical methodology
 
