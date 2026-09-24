@@ -34,7 +34,7 @@ The agent may infer topic, languages, dates and a decision criterion from natura
 
 `wikipedia-interest analyze --topic TOPIC --languages pl,cs --start 2024-09 --end 2026-09 --granularity auto --output output`
 
-Stdout is one JSON object and stderr contains human-readable operational errors only. `report --run output/RUN_ID` adds a one-page PDF. `inspect-run output/RUN_ID` emits a compact summary. `analyze --from-run output/RUN_ID` reuses the prior request and cache while allowing request flags to override it.
+Stdout is one JSON object, including argument-parser errors (`INVALID_REQUEST`); stderr contains a short human-readable error. `report --run output/RUN_ID` adds a one-page PDF. `inspect-run output/RUN_ID` emits a compact summary. `analyze --from-run output/RUN_ID` reuses the prior request and cache while allowing request flags to override it.
 
 ## Cache and persistence
 
@@ -42,11 +42,13 @@ Cache entries live in `.cache/` and are keyed by endpoint inputs, project, artic
 
 ## Resolution
 
-The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. Wikidata is queried only when requested languages are missing from langlinks. It falls back to a target-language search only when necessary. Exact/linked matches are high/medium confidence; weak lexical matches and Wikipedia disambiguation pages are low-confidence candidates with explicit warnings. Top target-language search matches are also low-confidence candidates, and low-confidence candidates are excluded from comparison rankings. Unresolved languages are explicit errors rather than silent substitutions.
+The resolver searches English Wikipedia once for a canonical topic, requests its interlanguage links, and selects the exact target language link. Wikidata is queried only when requested languages are missing from langlinks. It falls back to a target-language search only when necessary. Exact/linked matches are high/medium confidence; weak lexical matches and Wikipedia disambiguation pages are low-confidence candidates with explicit warnings. Top target-language search matches are also low-confidence candidates, and low-confidence candidates are excluded from comparison rankings. Refine the topic and rerun if a resolved title does not represent the intended concept; there is no article verification or override state. Unresolved languages are explicit errors rather than silent substitutions.
 
 ## Statistical methodology
 
 Monthly is the default for spans over 180 days; daily is used for shorter spans. The current incomplete period is excluded. Missing expected periods remain null/gapped for plotting and are excluded from calculations. Metrics include robust level statistics, first-vs-last window growth, 12-period YoY where possible, log-linear annualized trend, smoothed trend, volatility, completeness and robust spike detection. Trend labels use documented thresholds, not an LLM judgement. Analyze stdout is compact; full observations remain in `result.json` and can be requested with `--verbose-json`.
+
+Comparison reports `eligible_series_count`, `excluded_series_count` and `no_eligible_series`. If no series is eligible, `no_positive_growth_signal` is null; it is true only when eligible series exist but none has positive growth.
 
 ## Reliability methodology
 

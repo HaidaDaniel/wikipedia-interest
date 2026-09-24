@@ -148,7 +148,7 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
         limitations.append(f"Requested end extends beyond available data; observations were fetched through {available_end.isoformat()}.")
     if comparison.get("excluded_low_confidence"):
         languages = ", ".join(item["language"] for item in comparison["excluded_low_confidence"])
-        limitations.append(f"Low-confidence article candidates ({languages}) were retained for inspection but excluded from comparison; verify the resolved titles before using their metrics.")
+        limitations.append(f"Low-confidence article candidates ({languages}) were retained for inspection but excluded from comparison. Refine the topic and rerun if a resolved title does not represent the intended concept.")
     succeeded = sum(row.get("status") == "ok" for row in series)
     result = {
         "status": "ok",

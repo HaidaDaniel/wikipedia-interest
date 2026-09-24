@@ -18,6 +18,14 @@ The local ignored `output/` contained 25 run directories, 5 manual-evaluation no
 | P2 | Agent could suggest an unsupported article override | Capability boundary was implicit | `SKILL.md` now states that unsupported flags must not be promised; current CLI has no article override |
 | P2 | Growing direction could be described as stable evidence | Trend label and evidence quality were not explicitly separated | `SKILL.md` now requires R², reliability, volatility, completeness and base-size caveats |
 
+## Final contract and rendering review
+
+- Font selection now requires only fixed chart/report labels plus the actual topic, article and language text. A greedy ordered fallback stack combines installed fonts when needed; an ordinary Latin-only artifact does not require CJK glyphs.
+- Comparison output now reports eligible and excluded series separately. If all successful series are low confidence, `no_eligible_series` is true and `no_positive_growth_signal` is null. With eligible series and no positive growth, the latter is true.
+- PDF recommendations distinguish those two comparison states. Low-confidence wording asks users to refine the topic and rerun when a title is mismatched; the CLI has no article verification state.
+- Root and subcommand argparse failures now follow the stdout JSON error contract with `INVALID_REQUEST` and exit code 2.
+- `partial` remains a retrieval-success field. All retrieved series may yield `partial: false` while no series is eligible for comparison.
+
 ## Post-fix agent evaluations
 
 - Home solar batteries, de/pl/it: PASS. The local Qwen used 36 complete months, excluded all low-confidence candidates from comparison, identified the Polish duck-curve mismatch, and did not invent an override flag. Final deterministic run: `20260924T092306453290Z-6807dc96`.
@@ -30,4 +38,4 @@ Direct deterministic reruns also covered `Claude` in en/fr and `self-hosted AI` 
 
 - Wikipedia pageviews remain article attention, not market size, demand, conversion or product-market fit.
 - Ambiguous topics such as `Claude` still require human review of resolved articles; the resolver surfaces confidence and warnings but does not understand every semantic intent.
-- Complete CJK rendering depends on an installed Unicode-capable system font; the CLI warns and continues when none covers all requested scripts.
+- Complete multilingual rendering depends on installed fonts covering the actual artifact text; the CLI warns and continues only when the selected fallback stack still misses a requested glyph.

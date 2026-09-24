@@ -46,7 +46,7 @@ def create_chart(result: dict[str, Any], path: str | Path) -> Path:
         for anomaly in series.get("anomalies", []):
             ax.axvline(pd.to_datetime(anomaly["date"]), color="#dc2626", alpha=0.18, linewidth=1)
         metrics = series.get("metrics", {})
-        candidate = " · low-confidence candidate" if series.get("resolution", {}).get("confidence") == "low" else ""
+        candidate = " · low-confidence candidate, excluded from comparison" if series.get("resolution", {}).get("confidence") == "low" else ""
         ax.set_title(f"{series['language']} — {series.get('article', '')} · {metrics.get('trend_label', 'uncertain')}{candidate}", loc="left", fontsize=10, fontweight="normal")
         ax.set_ylabel("pageviews")
         ax.grid(axis="y", alpha=0.2)

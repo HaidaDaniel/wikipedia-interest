@@ -30,7 +30,11 @@ Do not promise an article override, exclusion rule, or other operation unless th
 
 Successful `analyze` output has `status`, `run_id`, `request`, `series`, `comparison`, `limitations`, and `artifacts`. Each successful series contains `language`, `project`, `article`, `resolution`, `metrics`, `reliability`, and `anomalies`; full observations are in persisted `result.json`, not default stdout. `metrics.trend_label` is one of `growing`, `declining`, `flat`, or `uncertain`; `reliability.level` is `high`, `medium`, or `low`. The reliability score is evidence quality, not a confidence interval.
 
-Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to stderr. Useful codes include `INVALID_REQUEST`, `INVALID_DATE`, `INVALID_DATE_RANGE`, `INVALID_LANGUAGES`, `INVALID_TOPIC`, `ARTICLE_NOT_FOUND`, `NO_DATA`, `WIKIMEDIA_API_ERROR`, and `LOCAL_ERROR`.
+Errors are JSON on stdout with `status: "error"` and `error.code`; a short human-readable line goes to stderr. Argument-parser errors use `INVALID_REQUEST` and exit code 2.
+
+Top-level error codes are `INVALID_REQUEST`, `INVALID_DATE`, `INVALID_DATE_RANGE`, `INVALID_LANGUAGES`, `INVALID_TOPIC`, `NO_DATA`, `WIKIMEDIA_API_ERROR`, and `LOCAL_ERROR`.
+
+Per-series error codes are `ARTICLE_NOT_FOUND`, `NO_DATA`, and `WIKIMEDIA_API_ERROR`. `ARTICLE_NOT_FOUND` is a series resolution result, not a top-level error code.
 
 ## Follow-ups and assumptions
 
@@ -41,9 +45,9 @@ Errors are JSON on stdout with `status: "error"` and `error.code`; logs go to st
 
 `--from-run` reuses the prior request fields and the filesystem cache but always creates a new run directory. Cached retrieval is keyed by project, article, access, agent, granularity and date range.
 
-Monthly analysis excludes the current incomplete calendar month and returns `request.data_through` plus `request.partial_period_excluded`. Missing periods are `views: null, observed: false`; genuine zero observations remain `views: 0, observed: true`. If some languages fail, continue with successful series and mention `partial`, `languages_failed`, and resolution warnings. If all fail, report the machine-readable `NO_DATA` error.
+Monthly analysis excludes the current incomplete calendar month and returns `request.data_through` plus `request.partial_period_excluded`. Missing periods are `views: null, observed: false`; genuine zero observations remain `views: 0, observed: true`. If some languages fail, continue with successful series and mention `partial`, `languages_failed`, and resolution warnings. `partial` describes retrieval success: successful low-confidence series still count as retrieved even when comparison excludes them. Use `comparison.eligible_series_count`, `excluded_series_count`, and `no_eligible_series` to explain comparison eligibility. If all retrievals fail, report the machine-readable `NO_DATA` error.
 
-Low-confidence target-language search results are candidates, not verified concept matches. They remain visible for inspection, but the deterministic comparison excludes them until the article is verified; state the semantic-mismatch risk. A `growing` or `declining` label describes direction only, not stability or strong evidence. Use `trend_fit_r2`, reliability, volatility, data completeness, resolution confidence and baseline size before calling a signal consistent or robust; growth from a very low base with a modest fit is provisional.
+Low-confidence article matches remain visible for inspection but are excluded from comparison. Refine the topic and rerun if a resolved title does not represent the intended concept; the CLI has no article verification or override state. If no series is eligible, `comparison.no_positive_growth_signal` is `null`. If eligible series exist but none shows positive growth, it is `true`. A `growing` or `declining` label describes direction only, not stability or strong evidence. Use `trend_fit_r2`, reliability, volatility, data completeness, resolution confidence and baseline size before calling a signal consistent or robust; growth from a very low base with a modest fit is provisional.
 
 ## Interpretation guardrails
 

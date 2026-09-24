@@ -9,7 +9,7 @@
 - [x] anomaly detection
 - [x] evidence-quality assessment
 - [x] chart and one-page PDF, including 4-language and partial-success paths
-- [x] stable JSON CLI and machine-readable errors
+- [x] stable JSON CLI and machine-readable errors, including argparse failures
 - [x] unit tests with fixtures/mocks
 - [x] three documented example scenarios and one committed demo artifact
 - [x] Agent Skill instructions

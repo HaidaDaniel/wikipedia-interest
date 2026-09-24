@@ -91,7 +91,7 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
                 item_confidence = "medium" if exact else "low"
                 item_warnings = [f"No English interlanguage link for {language}; target-language search was used."]
                 if not exact:
-                    item_warnings.append(f"Search selected '{title}'; verify that it represents the requested concept.")
+                    item_warnings.append(f"Search selected '{title}'; review whether it represents the requested concept.")
             else:
                 reason = "target-language search was unavailable" if search_unavailable else "no confident article match found"
                 item_method, item_confidence, item_warnings = "unresolved", "low", [f"{reason} for language '{language}'."]
@@ -99,8 +99,8 @@ def resolve_topic(topic: str, languages: list[str], client: WikimediaClient) -> 
             try:
                 if client.is_disambiguation(language, title):
                     item_confidence = "low"
-                    item_warnings.append("Resolved title is a Wikipedia disambiguation page; treat it as a low-confidence candidate and verify the intended concept.")
+                    item_warnings.append("Resolved title is a Wikipedia disambiguation page; treat it as a low-confidence candidate and review its concept match.")
             except InterestError:
-                item_warnings.append("Could not verify whether the resolved title is a disambiguation page; review the article before using its metrics.")
+                item_warnings.append("Disambiguation status could not be checked; review the article match before using its metrics.")
         resolved.append(ResolvedArticle(language, f"{language}.wikipedia.org", title, f"https://{language}.wikipedia.org/wiki/{quote(title.replace(' ', '_'), safe='') }" if title else None, item_method, item_confidence, item_warnings))
     return resolved

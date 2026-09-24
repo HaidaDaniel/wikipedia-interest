@@ -74,7 +74,7 @@ def assess_reliability(metrics: dict[str, Any], anomalies: list[dict[str, Any]],
         score -= 10
         reasons.append("article resolution is low confidence")
         score = min(score, 44)
-        reasons.append("low-confidence candidate is capped at low evidence quality until the article is verified")
+        reasons.append("low-confidence candidate is capped at low evidence quality and excluded from comparison")
     if resolution_confidence == "medium":
         score = min(score, 69)
         reasons.append("medium-confidence article resolution caps evidence quality at medium")

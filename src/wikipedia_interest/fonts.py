@@ -22,6 +22,7 @@ PREFERRED_FAMILIES = (
     "ipa gothic",
     "dejavu sans",
 )
+MAX_FALLBACK_FAMILIES = 4
 
 
 @lru_cache(maxsize=1)
@@ -83,7 +84,7 @@ def _select_font(text: str) -> tuple[list[str], bool]:
     available = set(coverage_by_family) - ({fallback_key} if fallback_key else set())
     selected: list[str] = []
     covered: set[int] = set()
-    while available:
+    while available and len(selected) < MAX_FALLBACK_FAMILIES:
         best = max(
             available,
             key=lambda key: (

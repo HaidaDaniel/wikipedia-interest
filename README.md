@@ -65,6 +65,10 @@ uv run wikipedia-interest inspect-run output/<run-id>
 
 Failed language resolutions remain visible as `unresolved/excluded` while successful languages continue through chart, comparison and PDF generation. If all languages fail, the CLI returns a machine-readable `NO_DATA` error.
 
+Successful pageview retrieval and comparison eligibility are separate. Low-confidence article candidates remain visible but are excluded from comparison; `comparison.eligible_series_count`, `excluded_series_count` and `no_eligible_series` show which series can be compared. When none is eligible, `no_positive_growth_signal` is `null`; it is `true` only when eligible series exist and none shows positive growth. The top-level `partial` flag describes retrieval failures, so fully retrieved low-confidence series can still produce `partial: false` and `no_eligible_series: true`.
+
+Invalid commands and malformed arguments also return the standard JSON error object on stdout with code `INVALID_REQUEST` and exit code 2; stderr has a short human-readable line.
+
 ## Install as an Agent Skill
 
 This repository is itself the Agent Skill directory. The canonical instructions are in the root `SKILL.md`; the executable package, tests, documentation and committed demo artifacts are part of the same directory.
@@ -114,7 +118,7 @@ Every follow-up is a new run; prior pageview data remains reusable through `.cac
 uv run pytest
 ```
 
-The current suite has **28 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability caps, resolver edge cases, retry behavior, compact JSON, multilingual rendering, multi-series charts, partial-success PDF, JSON shape and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
+The current suite has **41 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability caps, resolver edge cases, retry behavior, compact JSON, font selection and fallback behavior, all-low-confidence comparison eligibility, argparse JSON errors, multilingual rendering, multi-series charts, report wording and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
 
 Validation evidence is split into [free-model-opencode.md](docs/validation/free-model-opencode.md) and [local-qwen-opencode.md](docs/validation/local-qwen-opencode.md). Post-fix cases are summarized in [post-fix-evaluation.md](docs/post-fix-evaluation.md). Both OpenCode runs passed; the Claude Haiku attempt was not validation because its provider reported insufficient funds. The Agent Skills validator passes when run against a checkout whose directory is named `wikipedia-interest`:
 
