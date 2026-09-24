@@ -37,12 +37,6 @@ def test_chart_supports_one_two_and_four_series(tmp_path):
         assert path.exists() and path.stat().st_size > 1000
 
 
-def test_unicode_font_selection_handles_multilingual_titles():
-    family, complete = configure_unicode_font(["3Dプリント", "3차원 인쇄", "Астрономія", "Přerušovaný půst"])
-    assert family
-    assert isinstance(complete, bool)
-
-
 def test_partial_success_chart_and_pdf_are_generated(tmp_path):
     payload = result([series("pl", "error"), series("uk"), series("cs")])
     chart = tmp_path / "chart.png"

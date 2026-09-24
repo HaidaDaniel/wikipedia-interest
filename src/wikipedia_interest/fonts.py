@@ -10,9 +10,9 @@ from matplotlib import font_manager
 from matplotlib.ft2font import FT2Font
 
 
-# These samples cover the scripts most likely to appear in article titles and
-# language labels. The actual chart/report text is added by the caller too.
-BASELINE_TEXT = "Wikipedia interest Астрономія 3Dプリント 3차원 인쇄 Přerušovaný půst"
+# Static labels used across charts and reports. Topic, article, and language
+# text is added by the caller so unused scripts are not required.
+BASELINE_TEXT = "Wikipedia Interest Brief Pageviews views period trend Question compare Key findings evidence language article total generated • — ·"
 PREFERRED_FAMILIES = (
     "noto sans cjk",
     "source han",
@@ -49,20 +49,68 @@ def _preference_rank(name: str) -> int:
     return len(PREFERRED_FAMILIES)
 
 
-def _select_font(text: str) -> tuple[str, bool]:
+def _select_font(text: str) -> tuple[list[str], bool]:
     required = {ord(char) for char in text if not char.isspace()}
-    candidates: list[tuple[bool, int, int, str, str]] = []
+    coverage_by_family: dict[str, set[int]] = {}
+    display_name_by_family: dict[str, str] = {}
     for name, path, charmap in _font_inventory():
-        coverage = len(required & charmap)
-        candidates.append((coverage == len(required), coverage, -_preference_rank(name), name, path))
-    if not candidates:
-        return "DejaVu Sans", False
-    full, _, _, name, _ = max(candidates)
-    return name, full
+        family_key = name.casefold()
+        coverage_by_family.setdefault(family_key, set()).update(charmap)
+        display_name_by_family.setdefault(family_key, name)
+
+    if not coverage_by_family:
+        return ["DejaVu Sans"], False
+
+    complete_families = [
+        family_key
+        for family_key, charmap in coverage_by_family.items()
+        if required <= charmap
+    ]
+    if complete_families:
+        best = min(
+            complete_families,
+            key=lambda key: (_preference_rank(display_name_by_family[key]), key),
+        )
+        return [display_name_by_family[best]], True
+
+    # Greedily add the family that covers the most remaining characters.
+    # DejaVu is kept as the final fallback, rather than winning on Latin
+    # coverage before a more useful script-specific family is considered.
+    fallback_key = next(
+        (key for key, name in display_name_by_family.items() if "dejavu sans" in name.casefold()),
+        None,
+    )
+    available = set(coverage_by_family) - ({fallback_key} if fallback_key else set())
+    selected: list[str] = []
+    covered: set[int] = set()
+    while available:
+        best = max(
+            available,
+            key=lambda key: (
+                len((required - covered) & coverage_by_family[key]),
+                -_preference_rank(display_name_by_family[key]),
+                key,
+            ),
+        )
+        added = (required - covered) & coverage_by_family[best]
+        if not added:
+            break
+        selected.append(display_name_by_family[best])
+        covered.update(added)
+        available.remove(best)
+        if required <= covered:
+            return selected, True
+
+    if fallback_key:
+        selected.append(display_name_by_family[fallback_key])
+        covered.update(coverage_by_family[fallback_key])
+    elif "dejavu sans" not in {name.casefold() for name in selected}:
+        selected.append("DejaVu Sans")
+    return selected or ["DejaVu Sans"], required <= covered
 
 
-def configure_unicode_font(texts: Iterable[str] = ()) -> tuple[str, bool]:
-    """Configure a broadly Unicode-capable installed font for an artifact.
+def configure_unicode_font(texts: Iterable[str] = ()) -> tuple[list[str], bool]:
+    """Configure an ordered font stack covering the artifact's actual text.
 
     System fonts are deliberately selected at runtime so the package stays
     small and works across Linux/macOS/Windows environments. A best-effort
@@ -70,15 +118,15 @@ def configure_unicode_font(texts: Iterable[str] = ()) -> tuple[str, bool]:
     """
 
     text = BASELINE_TEXT + " " + " ".join(str(value) for value in texts if value)
-    family, complete = _select_font(text)
-    matplotlib.rcParams["font.family"] = [family]
+    families, complete = _select_font(text)
+    matplotlib.rcParams["font.family"] = families
     matplotlib.rcParams["axes.unicode_minus"] = False
     if not complete:
         warnings.warn(
-            "No installed font covers all requested multilingual glyphs; "
+            "No installed font stack covers all requested glyphs; "
             "install Noto Sans CJK, Source Han Sans, WenQuanYi or Unifont "
             "for complete chart/PDF rendering.",
             RuntimeWarning,
             stacklevel=2,
         )
-    return family, complete
+    return families, complete
