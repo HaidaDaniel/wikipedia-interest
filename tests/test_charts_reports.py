@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from wikipedia_interest.charts import create_chart
+from wikipedia_interest.fonts import configure_unicode_font
 from wikipedia_interest.report import create_report
 
 
@@ -34,6 +35,12 @@ def test_chart_supports_one_two_and_four_series(tmp_path):
         path = tmp_path / f"chart-{count}.png"
         create_chart(result([series(chr(97 + index)) for index in range(count)]), path)
         assert path.exists() and path.stat().st_size > 1000
+
+
+def test_unicode_font_selection_handles_multilingual_titles():
+    family, complete = configure_unicode_font(["3Dプリント", "3차원 인쇄", "Астрономія", "Přerušovaný půst"])
+    assert family
+    assert isinstance(complete, bool)
 
 
 def test_partial_success_chart_and_pdf_are_generated(tmp_path):

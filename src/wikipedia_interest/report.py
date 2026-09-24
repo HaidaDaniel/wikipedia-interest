@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 from .charts import create_chart
+from .fonts import configure_unicode_font
 
 
 def _finding(series: dict[str, Any]) -> str:
@@ -34,17 +35,22 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     if not successful:
         raise ValueError("cannot create a report without a successful series")
 
+    request = result.get("request", {})
+    configure_unicode_font([
+        str(request.get("topic", "")),
+        *(str(series.get("article", "")) for series in successful),
+        *(str(series.get("language", "")) for series in successful),
+    ])
     fig = plt.figure(figsize=(8.27, 11.69))
     fig.patch.set_facecolor("white")
-    request = result.get("request", {})
-    fig.text(0.07, 0.965, "Wikipedia Interest Brief", fontsize=19, weight="bold", color="#111827")
+    fig.text(0.07, 0.965, "Wikipedia Interest Brief", fontsize=19, weight="normal", color="#111827")
     fig.text(0.07, 0.942, request.get("topic", "topic"), fontsize=12, color="#374151")
     fig.text(0.07, 0.912, f"Question: compare pageview interest from {request.get('start')} to {request.get('end')}", fontsize=8.5, color="#4b5563")
     chart = plt.imread(chart_path)
     ax_chart = fig.add_axes([0.07, 0.55, 0.86, 0.31])
     ax_chart.imshow(chart)
     ax_chart.axis("off")
-    fig.text(0.07, 0.525, "Key findings", fontsize=11, weight="bold", color="#111827")
+    fig.text(0.07, 0.525, "Key findings", fontsize=11, weight="normal", color="#111827")
     y = 0.498
     for series in successful[:4]:
         fig.text(0.085, y, "• " + _finding(series), fontsize=8.5, color="#1f2937", wrap=True)
@@ -64,7 +70,7 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     fig.text(0.07, y - 0.005, recommendation, fontsize=8.5, color="#1d4ed8")
 
     table_y = y - 0.055
-    fig.text(0.07, table_y + 0.035, "Compact comparison", fontsize=10, weight="bold", color="#111827")
+    fig.text(0.07, table_y + 0.035, "Compact comparison", fontsize=10, weight="normal", color="#111827")
     columns = ["Language", "Article/status", "Total", "Trend", "Evidence"]
     rows = []
     for series in successful:
@@ -87,9 +93,9 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
             cell.set_edgecolor("#d1d5db")
             if row == 0:
                 cell.set_facecolor("#eff6ff")
-                cell.set_text_props(weight="bold")
+                cell.set_text_props(weight="normal")
 
-    fig.text(0.07, 0.19, "Caveats", fontsize=10, weight="bold", color="#111827")
+    fig.text(0.07, 0.19, "Caveats", fontsize=10, weight="normal", color="#111827")
     caveat = "Wikipedia pageviews are attention, not market size, willingness to pay, conversion, or product-market fit. Cross-language totals are not directly comparable; inspect article coverage and validate with external research."
     fig.text(0.07, 0.165, caveat, fontsize=8, color="#4b5563", wrap=True, linespacing=1.35)
     if any(series.get("resolution", {}).get("confidence") == "low" for series in successful):
