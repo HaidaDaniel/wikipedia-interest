@@ -10,3 +10,5 @@ output/*
 !output/.gitkeep
 *.egg-info/
 
+# OpenCode runs the project-local skill from its discovery directory.
+.agents/skills/wikipedia-interest/output/
