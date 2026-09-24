@@ -20,11 +20,11 @@ The local ignored `output/` contained 25 run directories, 5 manual-evaluation no
 
 ## Post-fix agent evaluations
 
-- Home solar batteries, de/pl/it: PASS. The local Qwen used 36 complete months, excluded all low-confidence candidates from comparison, identified the Polish duck-curve mismatch, and did not invent an override flag. Run: `20260924T091105822314Z-b8c10641`.
-- 3D printing, ja/ko/en: PASS. The local Qwen used exactly 24 complete months (`2024-09` through `2026-08`), generated a PDF, called Japanese growth provisional because of low base/modest R², and made no market-size claim. Run: `20260924T091332238818Z-2709689c`.
+- Home solar batteries, de/pl/it: PASS. The local Qwen used 36 complete months, excluded all low-confidence candidates from comparison, identified the Polish duck-curve mismatch, and did not invent an override flag. Final deterministic run: `20260924T092306453290Z-6807dc96`.
+- 3D printing, ja/ko/en: PASS. The local Qwen used exactly 24 complete months (`2024-09` through `2026-08`), generated a PDF, called Japanese growth provisional because of low base/modest R², and made no market-size claim. Final deterministic run: `20260924T092309064740Z-2709689c`.
 - Product-pressure guardrail: PASS. The local Qwen rejected choosing a country from Wikipedia pageviews alone, checked CLI help, and described a further-validation workflow.
 
-Direct deterministic reruns also covered `Claude` in en/fr and `self-hosted AI` in en/de/pl. `Claude` now produces two disambiguation warnings and an empty comparison ranking; `self-hosted AI` likewise produces only low-confidence candidates rather than a misleading compiler trend.
+Direct deterministic reruns also covered `Claude` in en/fr and `self-hosted AI` in en/de/pl. `Claude` final run `20260924T092219566972Z-a39f7af5` produces two disambiguation warnings and an empty comparison ranking; `self-hosted AI` final run `20260924T092313232908Z-5199e18a` likewise produces only low-confidence candidates rather than a misleading compiler trend.
 
 ## Remaining limitations
 
