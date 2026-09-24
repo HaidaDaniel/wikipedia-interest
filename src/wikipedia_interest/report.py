@@ -20,7 +20,7 @@ def _finding(series: dict[str, Any]) -> str:
     growth_text = "trend unavailable" if growth is None else f"{growth:+.1f}% annualized trend"
     reliability = series.get("reliability", {})
     confidence = series.get("resolution", {}).get("confidence")
-    resolution_text = "; low-confidence candidate — verify article match" if confidence == "low" else ""
+    resolution_text = "; low-confidence candidate — excluded from comparison" if confidence == "low" else ""
     return f"{series.get('language', '?')}: {metrics.get('trend_label', 'uncertain')}; {growth_text}; evidence {reliability.get('level', 'unknown')} ({reliability.get('score', 'n/a')}/100){resolution_text}."
 
 
@@ -61,7 +61,9 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
 
     comparison = result.get("comparison", {})
     strongest = comparison.get("strongest_signal")
-    if comparison.get("criterion") == "stability" and strongest:
+    if comparison.get("no_eligible_series") is True:
+        recommendation = "No verified article matches are eligible for comparison; review or refine the low-confidence candidates."
+    elif comparison.get("criterion") == "stability" and strongest:
         recommendation = f"Most reliable evidence: {strongest['language']} (stability criterion)."
     elif strongest:
         recommendation = f"Strongest positive signal for further validation: {strongest['language']}."
@@ -99,7 +101,7 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     caveat = "Wikipedia pageviews are attention, not market size, willingness to pay, conversion, or product-market fit. Cross-language totals are not directly comparable; inspect article coverage and validate with external research."
     fig.text(0.07, 0.165, caveat, fontsize=8, color="#4b5563", wrap=True, linespacing=1.35)
     if any(series.get("resolution", {}).get("confidence") == "low" for series in successful):
-        fig.text(0.07, 0.14, "* Low-confidence article candidate; excluded from comparison until verified.", fontsize=7.5, color="#b45309")
+        fig.text(0.07, 0.14, "* Low-confidence candidate; excluded from comparison. Refine the topic and rerun if the title does not represent the intended concept.", fontsize=7.5, color="#b45309")
     source_y = 0.105 if not any(series.get("resolution", {}).get("confidence") == "low" for series in successful) else 0.09
     fig.text(0.07, source_y, "Source: Wikimedia Pageviews API · monthly/daily deterministic analysis · reliability is evidence quality, not a confidence interval.", fontsize=7.5, color="#6b7280")
     fig.text(0.07, source_y - 0.03, f"Generated {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} · run {result['run_id']}", fontsize=7.5, color="#9ca3af")

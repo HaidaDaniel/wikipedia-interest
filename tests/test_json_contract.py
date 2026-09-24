@@ -22,13 +22,32 @@ def test_all_declining_has_no_positive_signal():
     result = compare_series(series, "balanced")
     assert result["strongest_signal"] is None
     assert result["no_positive_growth_signal"] is True
+    assert result["eligible_series_count"] == 1
+    assert result["no_eligible_series"] is False
 
 
 def test_low_confidence_candidates_are_excluded_from_comparison():
     result = compare_series([
-        {"status": "ok", "language": "pl", "article": "Unverified", "resolution": {"confidence": "low"}, "metrics": {"trend_label": "growing", "trend_pct_per_year": 80}, "reliability": {"level": "low", "score": 40}},
-        {"status": "ok", "language": "de", "article": "Verified", "resolution": {"confidence": "high"}, "metrics": {"trend_label": "flat", "trend_pct_per_year": 0}, "reliability": {"level": "high", "score": 80}},
+        {"status": "ok", "language": "pl", "article": "Candidate", "resolution": {"confidence": "low"}, "metrics": {"trend_label": "growing", "trend_pct_per_year": 80}, "reliability": {"level": "low", "score": 40}},
+        {"status": "ok", "language": "de", "article": "Linked", "resolution": {"confidence": "high"}, "metrics": {"trend_label": "flat", "trend_pct_per_year": 0}, "reliability": {"level": "high", "score": 80}},
     ])
     assert [row["language"] for row in result["ranking"]] == ["de"]
     assert result["strongest_signal"] is None
     assert result["excluded_low_confidence"][0]["language"] == "pl"
+    assert result["eligible_series_count"] == 1
+    assert result["excluded_series_count"] == 1
+    assert result["no_eligible_series"] is False
+    assert result["no_positive_growth_signal"] is True
+
+
+def test_all_low_confidence_is_not_reported_as_a_valid_no_growth_comparison():
+    result = compare_series([
+        {"status": "ok", "language": "en", "article": "Claude", "resolution": {"confidence": "low"}, "metrics": {"trend_label": "declining", "trend_pct_per_year": -80}, "reliability": {"level": "low", "score": 20}},
+        {"status": "ok", "language": "de", "article": "Claude", "resolution": {"confidence": "low"}, "metrics": {"trend_label": "growing", "trend_pct_per_year": 100}, "reliability": {"level": "low", "score": 20}},
+    ])
+
+    assert result["ranking"] == []
+    assert result["eligible_series_count"] == 0
+    assert result["excluded_series_count"] == 2
+    assert result["no_eligible_series"] is True
+    assert result["no_positive_growth_signal"] is None

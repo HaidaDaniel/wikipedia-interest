@@ -1,7 +1,8 @@
 from pathlib import Path
 
+from wikipedia_interest.analysis import compare_series
 from wikipedia_interest.charts import create_chart
-from wikipedia_interest.fonts import configure_unicode_font
+import wikipedia_interest.report as report_module
 from wikipedia_interest.report import create_report
 
 
@@ -44,3 +45,54 @@ def test_partial_success_chart_and_pdf_are_generated(tmp_path):
     report = create_report(payload, tmp_path)
     assert chart.exists() and chart.stat().st_size > 1000
     assert report.exists() and report.stat().st_size > 1000
+
+
+def _capture_pdf_text(monkeypatch):
+    captured = []
+
+    class CapturePdfPages:
+        def __init__(self, path):
+            self.path = Path(path)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def savefig(self, fig, **kwargs):
+            captured.extend(item.get_text() for item in fig.texts)
+            self.path.write_bytes(b"synthetic PDF")
+
+    monkeypatch.setattr(report_module, "PdfPages", CapturePdfPages)
+    return captured
+
+
+def test_report_distinguishes_all_low_confidence_from_no_growth(tmp_path, monkeypatch):
+    captured = _capture_pdf_text(monkeypatch)
+    candidates = [series("en"), series("de")]
+    for item in candidates:
+        item["resolution"] = {"confidence": "low"}
+        item["article"] = "Claude"
+    payload = result(candidates)
+    payload["comparison"] = compare_series(candidates)
+
+    create_report(payload, tmp_path)
+
+    text = "\n".join(captured)
+    assert "No verified article matches are eligible for comparison" in text
+    assert "No clear positive growth signal was found" not in text
+
+
+def test_report_uses_no_growth_wording_for_eligible_declining_series(tmp_path, monkeypatch):
+    captured = _capture_pdf_text(monkeypatch)
+    declining = series("en")
+    declining["resolution"] = {"confidence": "high"}
+    declining["metrics"].update({"trend_label": "declining", "trend_pct_per_year": -30})
+    payload = result([declining])
+    payload["comparison"] = compare_series([declining])
+
+    create_report(payload, tmp_path)
+
+    text = "\n".join(captured)
+    assert "No clear positive growth signal was found in this comparison." in text
