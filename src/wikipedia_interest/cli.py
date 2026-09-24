@@ -137,16 +137,20 @@ def _analyze(args: argparse.Namespace) -> dict[str, Any]:
         client.close()
     if not any(row.get("status") == "ok" for row in series):
         raise InterestError("NO_DATA", "no requested language produced usable pageview data", {"run_id": run_id})
+    comparison = compare_series(series, request.criterion)
     limitations = list(LIMITATIONS)
     if partial_period_excluded:
         limitations.append(f"Requested end extends beyond available data; observations were fetched through {available_end.isoformat()}.")
+    if comparison.get("excluded_low_confidence"):
+        languages = ", ".join(item["language"] for item in comparison["excluded_low_confidence"])
+        limitations.append(f"Low-confidence article candidates ({languages}) were retained for inspection but excluded from comparison; verify the resolved titles before using their metrics.")
     succeeded = sum(row.get("status") == "ok" for row in series)
     result = {
         "status": "ok",
         "run_id": run_id,
         "request": persisted_request,
         "series": series,
-        "comparison": compare_series(series, request.criterion),
+        "comparison": comparison,
         "limitations": limitations,
         "partial": succeeded < len(request.languages),
         "languages_requested": len(request.languages),

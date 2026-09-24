@@ -22,3 +22,13 @@ def test_all_declining_has_no_positive_signal():
     result = compare_series(series, "balanced")
     assert result["strongest_signal"] is None
     assert result["no_positive_growth_signal"] is True
+
+
+def test_low_confidence_candidates_are_excluded_from_comparison():
+    result = compare_series([
+        {"status": "ok", "language": "pl", "article": "Unverified", "resolution": {"confidence": "low"}, "metrics": {"trend_label": "growing", "trend_pct_per_year": 80}, "reliability": {"level": "low", "score": 40}},
+        {"status": "ok", "language": "de", "article": "Verified", "resolution": {"confidence": "high"}, "metrics": {"trend_label": "flat", "trend_pct_per_year": 0}, "reliability": {"level": "high", "score": 80}},
+    ])
+    assert [row["language"] for row in result["ranking"]] == ["de"]
+    assert result["strongest_signal"] is None
+    assert result["excluded_low_confidence"][0]["language"] == "pl"

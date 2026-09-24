@@ -168,7 +168,20 @@ def analyze_series(points: list[PageviewPoint], start: date, end: date, granular
 
 
 def compare_series(series: list[dict[str, Any]], criterion: str = "balanced") -> dict[str, Any]:
-    usable = [item for item in series if item.get("status") == "ok" and "metrics" in item]
+    usable = []
+    excluded_low_confidence = []
+    for item in series:
+        if item.get("status") != "ok" or "metrics" not in item:
+            continue
+        confidence = item.get("resolution", {}).get("confidence", "high")
+        if confidence == "low":
+            excluded_low_confidence.append({
+                "language": item.get("language"),
+                "article": item.get("article"),
+                "reason": "low-confidence article resolution; candidate excluded from comparison",
+            })
+            continue
+        usable.append(item)
     rankings = []
     for item in usable:
         metrics = item["metrics"]
@@ -195,6 +208,7 @@ def compare_series(series: list[dict[str, Any]], criterion: str = "balanced") ->
         "fastest_growth": fastest,
         "most_reliable": stable,
         "no_positive_growth_signal": not bool(positive),
+        "excluded_low_confidence": excluded_low_confidence,
         "rationale": rationale,
         "interpretation": "Absolute views indicate article attention, not comparable language-market size.",
     }

@@ -73,6 +73,11 @@ def assess_reliability(metrics: dict[str, Any], anomalies: list[dict[str, Any]],
     else:
         score -= 10
         reasons.append("article resolution is low confidence")
+        score = min(score, 44)
+        reasons.append("low-confidence candidate is capped at low evidence quality until the article is verified")
+    if resolution_confidence == "medium":
+        score = min(score, 69)
+        reasons.append("medium-confidence article resolution caps evidence quality at medium")
     score = max(0, min(100, score))
     level = "high" if score >= 70 else "medium" if score >= 45 else "low"
     return {"level": level, "score": score, "reasons": reasons, "note": "Heuristic evidence quality, not a statistical confidence interval."}

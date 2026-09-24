@@ -18,7 +18,9 @@ def _finding(series: dict[str, Any]) -> str:
     growth = metrics.get("trend_pct_per_year")
     growth_text = "trend unavailable" if growth is None else f"{growth:+.1f}% annualized trend"
     reliability = series.get("reliability", {})
-    return f"{series.get('language', '?')}: {metrics.get('trend_label', 'uncertain')}; {growth_text}; evidence {reliability.get('level', 'unknown')} ({reliability.get('score', 'n/a')}/100)."
+    confidence = series.get("resolution", {}).get("confidence")
+    resolution_text = "; low-confidence candidate — verify article match" if confidence == "low" else ""
+    return f"{series.get('language', '?')}: {metrics.get('trend_label', 'uncertain')}; {growth_text}; evidence {reliability.get('level', 'unknown')} ({reliability.get('score', 'n/a')}/100){resolution_text}."
 
 
 def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
@@ -67,7 +69,11 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     rows = []
     for series in successful:
         metrics = series["metrics"]
-        rows.append([series["language"], series.get("article", "")[:22], f"{metrics.get('total_views', 0):,}", metrics.get("trend_label", "uncertain"), series.get("reliability", {}).get("level", "n/a")])
+        confidence = series.get("resolution", {}).get("confidence")
+        article = series.get("article", "")[:22]
+        if confidence == "low":
+            article = f"{article}*"
+        rows.append([series["language"], article, f"{metrics.get('total_views', 0):,}", metrics.get("trend_label", "uncertain"), series.get("reliability", {}).get("level", "n/a")])
     for series in failed:
         rows.append([series.get("language", "?"), "unresolved / excluded", "—", "—", "—"])
     if rows:
@@ -86,8 +92,11 @@ def create_report(result: dict[str, Any], run_dir: str | Path) -> Path:
     fig.text(0.07, 0.19, "Caveats", fontsize=10, weight="bold", color="#111827")
     caveat = "Wikipedia pageviews are attention, not market size, willingness to pay, conversion, or product-market fit. Cross-language totals are not directly comparable; inspect article coverage and validate with external research."
     fig.text(0.07, 0.165, caveat, fontsize=8, color="#4b5563", wrap=True, linespacing=1.35)
-    fig.text(0.07, 0.105, "Source: Wikimedia Pageviews API · monthly/daily deterministic analysis · reliability is evidence quality, not a confidence interval.", fontsize=7.5, color="#6b7280")
-    fig.text(0.07, 0.075, f"Generated {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} · run {result['run_id']}", fontsize=7.5, color="#9ca3af")
+    if any(series.get("resolution", {}).get("confidence") == "low" for series in successful):
+        fig.text(0.07, 0.14, "* Low-confidence article candidate; excluded from comparison until verified.", fontsize=7.5, color="#b45309")
+    source_y = 0.105 if not any(series.get("resolution", {}).get("confidence") == "low" for series in successful) else 0.09
+    fig.text(0.07, source_y, "Source: Wikimedia Pageviews API · monthly/daily deterministic analysis · reliability is evidence quality, not a confidence interval.", fontsize=7.5, color="#6b7280")
+    fig.text(0.07, source_y - 0.03, f"Generated {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} · run {result['run_id']}", fontsize=7.5, color="#9ca3af")
     with PdfPages(report_path) as pdf:
         pdf.savefig(fig, bbox_inches="tight")
     plt.close(fig)
