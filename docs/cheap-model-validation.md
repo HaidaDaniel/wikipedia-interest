@@ -1,4 +1,11 @@
-# Cheap-model validation
+# Cheap-model validation index
+
+Detailed evidence is kept in:
+
+- [free-model-opencode.md](validation/free-model-opencode.md)
+- [local-qwen-opencode.md](validation/local-qwen-opencode.md)
+
+The summaries below are retained as a compact reviewer index.
 
 Status: **passed** with a free OpenCode model.
 
@@ -35,4 +42,4 @@ Status: **passed** with the configured local Llama.cpp provider.
 - Endpoint: `http://192.168.0.95:8000/v1`
 - Working directory: repository root
 
-The same prompt completed end to end through the local model: it discovered the skill, ran `analyze`, read the compact JSON, ran `report`, and returned a conservative answer. The generated report was `output/20260924T061457546715Z-bc07ab6a/report.pdf`; it is a one-page PDF. The result matched the deterministic CLI: `Астрономія`, declining approximately `-63.8%/yr`, high reliability score `89`, with data through `2026-08-31`.
+The same prompt completed end to end through the local model: it discovered the skill, ran `analyze`, read the compact JSON, ran `report`, and returned a conservative answer. The generated report was `output/20260924T064010989656Z-bc07ab6a/report.pdf`; it is a one-page PDF. The result matched the deterministic CLI: `Астрономія`, declining approximately `-63.8%/yr`, high reliability score `89`, with data through `2026-08-31`.

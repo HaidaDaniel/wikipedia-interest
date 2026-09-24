@@ -15,7 +15,7 @@ class WikimediaAPIError(InterestError):
     pass
 
 
-USER_AGENT = "wikipedia-interest/0.1 (https://github.com/HaidaDaniel/wikiInteresestSkill)"
+USER_AGENT = "wikipedia-interest/0.1 (https://github.com/HaidaDaniel/wikipedia-interest)"
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 MAX_ATTEMPTS = 3
 

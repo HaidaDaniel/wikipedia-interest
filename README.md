@@ -67,23 +67,31 @@ Failed language resolutions remain visible as `unresolved/excluded` while succes
 
 ## Install as an Agent Skill
 
-For OpenCode or another Agent Skills-compatible agent, use the repository as the project and expose the project-local skill directory:
+This repository is itself the Agent Skill directory. The canonical instructions are in the root `SKILL.md`; the executable package, tests, documentation and committed demo artifacts are part of the same directory.
 
 ```bash
-git clone https://github.com/HaidaDaniel/wikiInteresestSkill.git wikipedia-interest
+git clone https://github.com/HaidaDaniel/wikipedia-interest.git
 cd wikipedia-interest
 uv sync
-# OpenCode discovers .agents/skills/wikipedia-interest/SKILL.md automatically.
+# The repository root is the canonical skill.
 ```
 
-For a separate host skill directory, use a symlink or copy while keeping the executable repository available as the working directory:
+Validate the root from its parent directory so the validator sees the skill directory name:
 
 ```bash
-mkdir -p /path/to/agent-project/.agents/skills
-ln -s /absolute/path/to/wikiInteresestSkill /path/to/agent-project/.agents/skills/wikipedia-interest
+cd ..
+uvx --from skills-ref agentskills validate wikipedia-interest
 ```
 
-The canonical skill name is `wikipedia-interest`; the existing GitHub repository name is not changed by this local package.
+For OpenCode project-local discovery, this repository includes a compatibility directory whose only file is a relative symlink at `.agents/skills/wikipedia-interest/SKILL.md` pointing to the root instructions. This avoids a second source of truth and avoids recursive directory symlinks. If the file symlink is not preserved by a filesystem or archive, recreate it from the repository root:
+
+```bash
+mkdir -p .agents/skills
+mkdir -p .agents/skills/wikipedia-interest
+ln -s ../../../SKILL.md .agents/skills/wikipedia-interest/SKILL.md
+```
+
+The target must resolve to the repository root containing the canonical `SKILL.md`; do not create a second copied `SKILL.md` or a symlinked directory loop.
 
 ## Methodology and reliability
 
@@ -106,9 +114,13 @@ Every follow-up is a new run; prior pageview data remains reusable through `.cac
 uv run pytest
 ```
 
-The current suite has **24 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability, resolver edge cases, retry behavior, compact JSON, multi-series charts, partial-success PDF, JSON shape and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly. OpenCode 1.18.31 successfully validated the skill with `opencode/mimo-v2.6-flash-free`; the exact prompt and evidence are in [docs/cheap-model-validation.md](docs/cheap-model-validation.md).
+The current suite has **24 tests passed** and covers metric direction, seasonality-aware YoY, real zeroes vs missing periods, cutoff, anomalies, reliability, resolver edge cases, retry behavior, compact JSON, multi-series charts, partial-success PDF, JSON shape and persistence. Three real-data scenario commands are documented in [examples/README.md](examples/README.md). Network integration is intentionally manual and cache-friendly.
 
-Official validation passes for the OpenCode-installable skill directory: `uvx --from skills-ref agentskills validate .agents/skills/wikipedia-interest`. Validating the GitHub repository root itself intentionally fails the directory-name check because the existing repository name is `wikiInteresestSkill`; use the nested canonical skill path when installing it.
+Validation evidence is split into [free-model-opencode.md](docs/validation/free-model-opencode.md) and [local-qwen-opencode.md](docs/validation/local-qwen-opencode.md). Both OpenCode runs passed; the Claude Haiku attempt was not validation because its provider reported insufficient funds. The Agent Skills validator passes when run against a checkout whose directory is named `wikipedia-interest`:
+
+```bash
+uvx --from skills-ref agentskills validate wikipedia-interest
+```
 
 ## Limitations
 
@@ -120,4 +132,4 @@ Phase 2: Wikidata concept graphs, related-page groups, normalized language-audie
 
 ## Reviewer path
 
-Open `SKILL.md` for agent instructions, `PLAN.md` for architecture, `METHODOLOGY.md` for formulas, `src/wikipedia_interest/cli.py` for the contract, and `examples/README.md` for real scenario commands.
+Open the root `SKILL.md` for agent instructions, `PLAN.md` for architecture, `METHODOLOGY.md` for formulas, `src/wikipedia_interest/cli.py` for the contract, and `examples/README.md` for real scenario commands. The GitHub repository rename from the historical typo to `wikipedia-interest` is a one-time manual owner action; no duplicate skill source is required.

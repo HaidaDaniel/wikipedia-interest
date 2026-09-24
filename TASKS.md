@@ -13,6 +13,11 @@
 - [x] unit tests with fixtures/mocks
 - [x] three documented example scenarios and one committed demo artifact
 - [x] Agent Skill instructions
+- [x] repository-root Agent Skills validation in a `wikipedia-interest`-named checkout
 - [x] README and methodology
 - [x] deterministic CLI end-to-end validation
 - [x] cheap external tool-capable model validation via OpenCode free model
+- [x] local Qwen OpenCode validation
+- [x] single canonical root `SKILL.md` with OpenCode discovery symlink
+- [x] split free/local validation evidence
+- [ ] rename GitHub repository to `wikipedia-interest` — requires manual GitHub owner action
